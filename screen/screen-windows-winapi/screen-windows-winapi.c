@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <sysinfoapi.h>
 #include <time.h>
 #include <math.h>
 
@@ -17,27 +16,6 @@ const int width = WWIDTH;
 const int height = WHEIGHT;
 const double density = 1920/0.508;
 // --------------
-
-LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LParam) {
-    switch(Message) {
-        case WM_KEYDOWN: {
-          switch(WParam) {
-						case 'O': {
-							DestroyWindow(Window);
-						};
-					}
-					break;
-        }
-        case WM_DESTROY: {
-					PostQuitMessage(0);
-					break;
-				}
-        default: {
-					return DefWindowProc(Window, Message, WParam,  LParam);
-				}
-    }
-    return 0;
-}
 
 double xGetCurrentTime(){
 	SYSTEMTIME systemTime;
@@ -62,12 +40,12 @@ bool quit = false;
 
 DWORD WINAPI ScreenDriverThread(LPVOID lpParam);
 
-HINSTANCE Instance;
+HINSTANCE hInstance;
 
 int ScreenPUProgram();
 
-int WINAPI WinMain(HINSTANCE pInstance, HINSTANCE PrevInstance, LPSTR CmdLine, int CmdShow) {
-	Instance = pInstance;
+int WINAPI WinMain(HINSTANCE rInstance, HINSTANCE PrevInstance, LPSTR CmdLine, int CmdShow) {
+	hInstance = rInstance;
 
 	semInit = CreateSemaphore(NULL, 0, 1, NULL);
 	semDone = CreateSemaphore(NULL, 0, 1, NULL);
@@ -87,102 +65,116 @@ int WINAPI WinMain(HINSTANCE pInstance, HINSTANCE PrevInstance, LPSTR CmdLine, i
 	return 0;
 }
 
+// ----------------------------------------------------------------------------
+
+struct {
+    int width;
+    int height;
+    uint32_t *pixels;
+} frame = {0};
+
+LRESULT CALLBACK WindowProcessMessage(HWND, UINT, WPARAM, LPARAM);
+
+static BITMAPINFO frame_bitmap_info;
+static HBITMAP frame_bitmap = 0;
+static HDC frame_device_context = 0;
+
+double now, last;
+
 DWORD WINAPI ScreenDriverThread(LPVOID lpParam){
-    WNDCLASS WindowClass = {};
-    const wchar_t ClassName[] = L"MyWindowClass";
-    WindowClass.lpfnWndProc = WindowProc;
-    WindowClass.hInstance = Instance;
-    WindowClass.lpszClassName = ClassName;
-    WindowClass.hCursor = LoadCursor(0, IDC_CROSS);
-		RegisterClass(&WindowClass);
+    const wchar_t window_class_name[] = L"My Window Class";
+    static WNDCLASS window_class = { 0 };
+    window_class.lpfnWndProc = WindowProcessMessage;
+    window_class.hInstance = hInstance;
+    window_class.lpszClassName = window_class_name;
+    RegisterClass(&window_class);
+
+    frame_bitmap_info.bmiHeader.biSize = sizeof(frame_bitmap_info.bmiHeader);
+    frame_bitmap_info.bmiHeader.biPlanes = 1;
+    frame_bitmap_info.bmiHeader.biBitCount = 32;
+    frame_bitmap_info.bmiHeader.biCompression = BI_RGB;
+    frame_device_context = CreateCompatibleDC(0);
 
 		printf("%d x %d\n", width, height);
 
 		RECT wr = {0, 0, width, height};
 		AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW|WS_VISIBLE, FALSE);
-    
-    HWND Window = CreateWindowEx(
-			0, ClassName, L"Windows Virtual Screen",
-			WS_OVERLAPPEDWINDOW|WS_VISIBLE,
-			CW_USEDEFAULT, CW_USEDEFAULT,
+
+    static HWND window_handle;
+    window_handle = CreateWindowEx(0, window_class_name, L"Windows API Virtual Screen", WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+    	CW_USEDEFAULT, CW_USEDEFAULT,
       wr.right - wr.left,
       wr.bottom - wr.top,
-			0, 0, Instance, 0
-		);
-    
-    // Pixels
-    pixels = VirtualAlloc(0,
-			width * height * 4,
-			MEM_RESERVE|MEM_COMMIT,
-			PAGE_READWRITE
-		);
- 
-    BITMAPINFO BitmapInfo;
-    BitmapInfo.bmiHeader.biSize = sizeof(BitmapInfo.bmiHeader);
-    BitmapInfo.bmiHeader.biWidth = width;
-    BitmapInfo.bmiHeader.biHeight = -height;
-    BitmapInfo.bmiHeader.biPlanes = 1;
-    BitmapInfo.bmiHeader.biBitCount = 32;
-    BitmapInfo.bmiHeader.biCompression = BI_RGB;
-    
-    HDC DeviceContext = GetDC(Window);
-    
-    bool Running = true;
+			NULL, NULL, hInstance, NULL);
 
-		int count = 0;
-		int prev, cur;
-		double now, last;
 		now = xGetCurrentTime();
 		last = xGetCurrentTime();
 
-		prev = time(NULL);
-    
-    while(Running) {
-        MSG Message;
-        while(PeekMessage(&Message, NULL, 0, 0, PM_REMOVE)) {
-            if(Message.message == WM_QUIT){
-							Running = false;
-						}
-            TranslateMessage(&Message);
-            DispatchMessage(&Message);
-        }
-
-				// Wait
-				while(now - last < 0.016){
-					now = xGetCurrentTime();
-					Sleep(2);
-				}
-				last = now;
-        
-				// Draw screen
-        SetDIBitsToDevice(
-					DeviceContext,
-					0, 0,
-					width, height,
-					0, 0,
-					0, height,
-					pixels, &BitmapInfo,
-					DIB_RGB_COLORS
-				);
-
-				count++;
-				cur = time(NULL);
-				if(prev != cur){
-					printf("FPS: %d\n", count);
-					count = 0;
-					prev = cur;
+    while(!quit) {
+        static MSG message = { 0 };
+        while(PeekMessage(&message, NULL, 0, 0, PM_REMOVE)) {
+					DispatchMessage(&message);
 				}
 
-				if(!init){
-					ReleaseSemaphore(semInit, 1, NULL);
-					init = true;
-				}
-				ReleaseSemaphore(semVSync, 1, NULL);
+        InvalidateRect(window_handle, NULL, FALSE);
+        UpdateWindow(window_handle);
     }
-    
+
     return 0;
 }
 
+
+LRESULT CALLBACK WindowProcessMessage(HWND window_handle, UINT message, WPARAM wParam, LPARAM lParam) {
+    switch(message) {
+        case WM_QUIT:
+        case WM_DESTROY: {
+            quit = true;
+        } break;
+
+        case WM_PAINT: {
+            static PAINTSTRUCT paint;
+            static HDC device_context;
+            device_context = BeginPaint(window_handle, &paint);
+            BitBlt(device_context,
+                   paint.rcPaint.left, paint.rcPaint.top,
+                   paint.rcPaint.right - paint.rcPaint.left, paint.rcPaint.bottom - paint.rcPaint.top,
+                   frame_device_context,
+                   paint.rcPaint.left, paint.rcPaint.top,
+                   SRCCOPY);
+            EndPaint(window_handle, &paint);
+
+						ReleaseSemaphore(semVSync, 1, NULL);
+						
+						now = xGetCurrentTime();
+						while(now - last < 0.016){
+							Sleep(1);
+							now = xGetCurrentTime();
+						}
+						last = now;
+        } break;
+
+        case WM_SIZE: {
+						if(!init){
+		          frame_bitmap_info.bmiHeader.biWidth  = LOWORD(lParam);
+		          frame_bitmap_info.bmiHeader.biHeight = HIWORD(lParam);
+
+		          if(frame_bitmap) DeleteObject(frame_bitmap);
+		          frame_bitmap = CreateDIBSection(NULL, &frame_bitmap_info, DIB_RGB_COLORS, (void**)&frame.pixels, 0, 0);
+		          SelectObject(frame_device_context, frame_bitmap);
+
+		          frame.width =  LOWORD(lParam);
+		          frame.height = HIWORD(lParam);
+							ReleaseSemaphore(semInit, 1, NULL);
+							init = true;
+						}
+        } break;
+
+        default: {
+            return DefWindowProc(window_handle, message, wParam, lParam);
+        }
+    }
+    return 0;
+}
 // ----------------------------------------------------------------------------
 
 void ScreenSize(int dev, double *rwidth, double *rheight, double *rdensity){
@@ -200,7 +192,8 @@ void Display(int dev, double *rpixels){
 			r = lround(rpixels[p*3 + 0] * 255);
 			g = lround(rpixels[p*3 + 1] * 255);
 			b = lround(rpixels[p*3 + 2] * 255);
-			pixels[p] = r << 16 | g << 8 | b;
+			p = (height - y - 1) * width + x;
+			frame.pixels[p] = r << 16 | g << 8 | b;
 		}
 	}
 }
