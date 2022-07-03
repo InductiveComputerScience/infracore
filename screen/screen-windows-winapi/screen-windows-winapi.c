@@ -68,9 +68,9 @@ int WINAPI WinMain(HINSTANCE rInstance, HINSTANCE PrevInstance, LPSTR CmdLine, i
 // ----------------------------------------------------------------------------
 
 struct {
-    int width;
-    int height;
-    uint32_t *pixels;
+		int width;
+		int height;
+		uint32_t *pixels;
 } frame = {0};
 
 LRESULT CALLBACK WindowProcessMessage(HWND, UINT, WPARAM, LPARAM);
@@ -82,66 +82,66 @@ static HDC frame_device_context = 0;
 double now, last;
 
 DWORD WINAPI ScreenDriverThread(LPVOID lpParam){
-    const wchar_t window_class_name[] = L"My Window Class";
-    static WNDCLASS window_class = { 0 };
-    window_class.lpfnWndProc = WindowProcessMessage;
-    window_class.hInstance = hInstance;
-    window_class.lpszClassName = window_class_name;
-    RegisterClass(&window_class);
+		const wchar_t window_class_name[] = L"My Window Class";
+		static WNDCLASS window_class = { 0 };
+		window_class.lpfnWndProc = WindowProcessMessage;
+		window_class.hInstance = hInstance;
+		window_class.lpszClassName = window_class_name;
+		RegisterClass(&window_class);
 
-    frame_bitmap_info.bmiHeader.biSize = sizeof(frame_bitmap_info.bmiHeader);
-    frame_bitmap_info.bmiHeader.biPlanes = 1;
-    frame_bitmap_info.bmiHeader.biBitCount = 32;
-    frame_bitmap_info.bmiHeader.biCompression = BI_RGB;
-    frame_device_context = CreateCompatibleDC(0);
+		frame_bitmap_info.bmiHeader.biSize = sizeof(frame_bitmap_info.bmiHeader);
+		frame_bitmap_info.bmiHeader.biPlanes = 1;
+		frame_bitmap_info.bmiHeader.biBitCount = 32;
+		frame_bitmap_info.bmiHeader.biCompression = BI_RGB;
+		frame_device_context = CreateCompatibleDC(0);
 
 		printf("%d x %d\n", width, height);
 
 		RECT wr = {0, 0, width, height};
 		AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW|WS_VISIBLE, FALSE);
 
-    static HWND window_handle;
-    window_handle = CreateWindowEx(0, window_class_name, L"Windows API Virtual Screen", WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-    	CW_USEDEFAULT, CW_USEDEFAULT,
-      wr.right - wr.left,
-      wr.bottom - wr.top,
+		static HWND window_handle;
+		window_handle = CreateWindowEx(0, window_class_name, L"Windows API Virtual Screen", WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+			CW_USEDEFAULT, CW_USEDEFAULT,
+			wr.right - wr.left,
+			wr.bottom - wr.top,
 			NULL, NULL, hInstance, NULL);
 
 		now = xGetCurrentTime();
 		last = xGetCurrentTime();
 
-    while(!quit) {
-        static MSG message = { 0 };
-        while(PeekMessage(&message, NULL, 0, 0, PM_REMOVE)) {
+		while(!quit) {
+				static MSG message = { 0 };
+				while(PeekMessage(&message, NULL, 0, 0, PM_REMOVE)) {
 					DispatchMessage(&message);
 				}
 
-        InvalidateRect(window_handle, NULL, FALSE);
-        UpdateWindow(window_handle);
-    }
+				InvalidateRect(window_handle, NULL, FALSE);
+				UpdateWindow(window_handle);
+		}
 
-    return 0;
+		return 0;
 }
 
 
 LRESULT CALLBACK WindowProcessMessage(HWND window_handle, UINT message, WPARAM wParam, LPARAM lParam) {
-    switch(message) {
-        case WM_QUIT:
-        case WM_DESTROY: {
-            quit = true;
-        } break;
+		switch(message) {
+				case WM_QUIT:
+				case WM_DESTROY: {
+						quit = true;
+				} break;
 
-        case WM_PAINT: {
-            static PAINTSTRUCT paint;
-            static HDC device_context;
-            device_context = BeginPaint(window_handle, &paint);
-            BitBlt(device_context,
-                   paint.rcPaint.left, paint.rcPaint.top,
-                   paint.rcPaint.right - paint.rcPaint.left, paint.rcPaint.bottom - paint.rcPaint.top,
-                   frame_device_context,
-                   paint.rcPaint.left, paint.rcPaint.top,
-                   SRCCOPY);
-            EndPaint(window_handle, &paint);
+				case WM_PAINT: {
+						static PAINTSTRUCT paint;
+						static HDC device_context;
+						device_context = BeginPaint(window_handle, &paint);
+						BitBlt(device_context,
+									 paint.rcPaint.left, paint.rcPaint.top,
+									 paint.rcPaint.right - paint.rcPaint.left, paint.rcPaint.bottom - paint.rcPaint.top,
+									 frame_device_context,
+									 paint.rcPaint.left, paint.rcPaint.top,
+									 SRCCOPY);
+						EndPaint(window_handle, &paint);
 
 						ReleaseSemaphore(semVSync, 1, NULL);
 						
@@ -151,29 +151,29 @@ LRESULT CALLBACK WindowProcessMessage(HWND window_handle, UINT message, WPARAM w
 							now = xGetCurrentTime();
 						}
 						last = now;
-        } break;
+				} break;
 
-        case WM_SIZE: {
+				case WM_SIZE: {
 						if(!init){
-		          frame_bitmap_info.bmiHeader.biWidth  = LOWORD(lParam);
-		          frame_bitmap_info.bmiHeader.biHeight = HIWORD(lParam);
+							frame_bitmap_info.bmiHeader.biWidth	= LOWORD(lParam);
+							frame_bitmap_info.bmiHeader.biHeight = HIWORD(lParam);
 
-		          if(frame_bitmap) DeleteObject(frame_bitmap);
-		          frame_bitmap = CreateDIBSection(NULL, &frame_bitmap_info, DIB_RGB_COLORS, (void**)&frame.pixels, 0, 0);
-		          SelectObject(frame_device_context, frame_bitmap);
+							if(frame_bitmap) DeleteObject(frame_bitmap);
+							frame_bitmap = CreateDIBSection(NULL, &frame_bitmap_info, DIB_RGB_COLORS, (void**)&frame.pixels, 0, 0);
+							SelectObject(frame_device_context, frame_bitmap);
 
-		          frame.width =  LOWORD(lParam);
-		          frame.height = HIWORD(lParam);
+							frame.width =	LOWORD(lParam);
+							frame.height = HIWORD(lParam);
 							ReleaseSemaphore(semInit, 1, NULL);
 							init = true;
 						}
-        } break;
+				} break;
 
-        default: {
-            return DefWindowProc(window_handle, message, wParam, lParam);
-        }
-    }
-    return 0;
+				default: {
+						return DefWindowProc(window_handle, message, wParam, lParam);
+				}
+		}
+		return 0;
 }
 // ----------------------------------------------------------------------------
 
