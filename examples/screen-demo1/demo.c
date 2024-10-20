@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <time.h>
 
 void DrawFilledRectangle(double *image, double x, double y, double w, double h, double W, double *color){
   double i, j;
@@ -33,6 +34,11 @@ void ScreenPUProgram(){
 
 	memset(pixels, 0, w * h * sizeof(double) * 3);
 
+	int count = 0;
+	int prev, cur;
+
+	prev = time(NULL);
+
 	for(;;){
 		x += dx;
 		y += dy;
@@ -56,6 +62,14 @@ void ScreenPUProgram(){
 
 		Display(0, pixels);
 		WaitForDraw(0);
+
+		count++;
+		cur = time(NULL);
+		if(prev != cur){
+			printf("FPS: %d\n", count);
+			count = 0;
+			prev = cur;
+		}
 	}
 }
 
