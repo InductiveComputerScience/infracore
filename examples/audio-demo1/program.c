@@ -27,7 +27,9 @@ void Program(AudioStructure *audio1){
 	double *audio = malloc(sizeof(double) * size);
 
 	for(i = 0; i < size; i++){
-		audio[(int)i] = sin(i/15);
+		double hz = 261.626;
+
+		audio[(int)i] = sin(i/samplesps*(2*M_PI) * hz);
 	}
 
 	// Main loop
