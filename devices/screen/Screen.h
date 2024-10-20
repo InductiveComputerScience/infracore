@@ -1,7 +1,19 @@
+#ifndef ScreenH
+#define ScreenH
+
 #include <stdint.h>
 
-// Screen Controller Instructions
-void ScreenSize(int dev, double *width, double *height, double *density);
-void Display(int dev, double *pixels);
-void WaitForDraw(int dev);
+struct ScreenStructure{
+	void *p;
+};
 
+typedef struct ScreenStructure ScreenStructure;
+
+// Screen Controller Instructions
+void ScreenSpecs(ScreenStructure *screen, double *width, double *height, double *density);
+void Display(ScreenStructure *screen, double *pixels);
+void Synchronize(ScreenStructure *screen);
+
+void DisplayBytes(ScreenStructure *screen, uint32_t *rpixels);
+
+#endif
