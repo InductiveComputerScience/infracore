@@ -6,6 +6,7 @@ Device interfaces, drivers and compositions.
  * audio - [interface](devices/audio/Audio.h)
  * clock - [interface](devices/clock/Clock.h)
  * disk - [interface](devices/disk/Disk.h)
+ * processing unit - [interface](devices/pu/ProcessingUnit.h)
 
 ## Drivers
  * screen and keyboard
@@ -18,7 +19,8 @@ Device interfaces, drivers and compositions.
  * disk
    * [C89 File Driver](drivers/disk-c89-file/)
    * [Linux File Driver](drivers/disk-linux-file/)
-
+ * processing unit
+   * [Linux Socket Driver](drivers/pu-linux-socket/)
 
 
 ## Examples
@@ -30,6 +32,8 @@ Device interfaces, drivers and compositions.
    * [Demo1](examples/clock-demo1/program.c) -- Prints the current time on screen, waits a second, and prints the time again.
  * disk
    * [Demo1](examples/disk-demo1/program.c) -- Read a string from disk and print it.
+ * processing unit
+   * [Server Demo1](examples/pu-server-demo1/program.c) -- Echoes the request in upper case.
 
 ## How to
 An infracore program consist of a function that takes the devices it uses as input. For example, a game needs a screen to display the game, an audio device to play sound, a clock to keep track of time and a disk for the game data:
