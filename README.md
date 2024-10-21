@@ -15,6 +15,9 @@ Device interfaces, drivers and compositions.
  * clock
    * [C11 Driver](drivers/clock-c11/)
    * [Linux Driver](drivers/clock-linux/)
+ * disk
+   * [C89 File Driver](drivers/disk-c89-file/)
+   * [Linux File Driver](drivers/disk-linux-file/)
 
 
 
@@ -25,6 +28,8 @@ Device interfaces, drivers and compositions.
    * [Demo1](examples/audio-demo1/program.c) -- Sending a pure C sine wave to an audio device.
  * clock
    * [Demo1](examples/clock-demo1/program.c) -- Prints the current time on screen, waits a second, and prints the time again.
+ * disk
+   * [Demo1](examples/disk-demo1/program.c) -- Read a string from disk and print it.
 
 ## How to
 An infracore program consist of a function that takes the devices it uses as input. For example, a game needs a screen to display the game, an audio device to play sound, a clock to keep track of time and a disk for the game data:
