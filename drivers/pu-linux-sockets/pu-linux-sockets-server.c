@@ -121,9 +121,22 @@ _Bool EnableKeepalive(int sock){
 void ServerSend(ProcessingUnitServerStructure *pu, double *message, size_t messageLength){
 	ProcessingUnitServerStructureSocket *puS = (ProcessingUnitServerStructureSocket*)pu->p;
 	double length = messageLength;
+	char lengthString[20];
+	uint8_t *buffer;
+	long i;
 
-	sendAll(puS->clientSocket, (uint8_t*)&length, sizeof(double));
-	sendAll(puS->clientSocket, (uint8_t*)message, length * sizeof(double));
+	buffer = malloc(messageLength);
+
+	for(i = 0; i < messageLength; i++){
+		buffer[i] = message[i];
+	}
+
+	sprintf(lengthString, "%15Ld", (long long)messageLength);
+
+	sendAll(puS->clientSocket, (uint8_t*)lengthString, 15);
+	sendAll(puS->clientSocket, buffer, messageLength);
+
+	free(buffer);
 }
 
 _Bool DoAcceptConnect(ProcessingUnitServerStructureSocket *puS){
@@ -146,7 +159,10 @@ _Bool DoAcceptConnect(ProcessingUnitServerStructureSocket *puS){
 void ServerReceive(ProcessingUnitServerStructure *pu, NumberArrayReference *message){
 	ProcessingUnitServerStructureSocket *puS = (ProcessingUnitServerStructureSocket*)pu->p;
 	double length;
+	char lengthStr[15];
 	_Bool success;
+	uint8_t *buffer;
+	long i;
 
 	if(!puS->connected){
 		success = DoAcceptConnect(puS);
@@ -154,15 +170,27 @@ void ServerReceive(ProcessingUnitServerStructure *pu, NumberArrayReference *mess
 
 	success = false;
 	while(!success){
-		success = recvAll(puS->clientSocket, (uint8_t*)&length, sizeof(double));
+		success = recvAll(puS->clientSocket, (uint8_t*)lengthStr, 15);
 		if(!success){
 			DoAcceptConnect(puS);
 		}
 	}
 
+	if(success){
+		length = atof(lengthStr);
+	}
+
 	message->numberArrayLength = length;
 	message->numberArray = malloc(message->numberArrayLength * sizeof(double));
-	recvAll(puS->clientSocket, (uint8_t*)message->numberArray, message->numberArrayLength * sizeof(double));
+
+	buffer = malloc(length);
+	recvAll(puS->clientSocket, buffer, length);
+
+	for(i = 0; i < length; i++){
+		message->numberArray[i] = buffer[i];
+	}
+
+	free(buffer);
 }
 
 
