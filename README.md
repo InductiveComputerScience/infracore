@@ -34,6 +34,7 @@ Device interfaces, drivers and compositions.
    * [Demo1](examples/disk-demo1/program.c) -- Read a string from disk and print it.
  * processing unit
    * [Server Demo1](examples/pu-server-demo1/program.c) -- Echoes the request in upper case.
+   * [Client Demo1](examples/pu-client-demo1/program.c) -- Sends the message "Hello, world!" to a server.
 
 ## How to
 An infracore program consist of a function that takes the devices it uses as input. For example, a game needs a screen to display the game, an audio device to play sound, a clock to keep track of time and a disk for the game data:
