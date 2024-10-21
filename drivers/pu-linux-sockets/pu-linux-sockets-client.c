@@ -12,6 +12,8 @@
 
 #include <ProcessingUnit.h>
 
+#include "pu-linux-sockets-client.h"
+
 struct ProcessingUnitStructureSocket{
 	int serverSockets;
 	struct sockaddr_un local;
@@ -20,32 +22,22 @@ struct ProcessingUnitStructureSocket{
 
 typedef struct ProcessingUnitStructureSocket ProcessingUnitStructureSocket;
 
-void **devices;
-
-int FOUT();
-
-int FIN(){
-	ProcessingUnitStructure *pu;
+_Bool CreateLinuxSocketClient(ProcessingUnitStructure **pu, char *filename){
 	ProcessingUnitStructureSocket *puS;
 	bool success;
 	int ret;
 
 	success = true;
 
-	#ifdef DEVINIT
-	devices = malloc(DEVINIT * sizeof(void*)); // Alloc #1
-	#endif
-
-	pu = malloc(sizeof(ProcessingUnitStructure)); // Alloc #2
-	devices[DEVICENR] = pu;
-	puS = malloc(sizeof(ProcessingUnitStructureSocket)); // Alloc #3
-	pu->p = puS;
+	*pu = malloc(sizeof(ProcessingUnitStructure)); // Alloc #1
+	puS = malloc(sizeof(ProcessingUnitStructureSocket)); // Alloc #1
+	(*pu)->p = puS;
 
 	puS->serverSockets = socket(AF_LOCAL, SOCK_STREAM, 0);
 
 	if(puS->serverSockets != -1){
 		puS->local.sun_family = AF_LOCAL;
-		strcpy(puS->local.sun_path, SOCKETNAME);
+		strcpy(puS->local.sun_path, filename);
 		puS->len = strlen(puS->local.sun_path) + sizeof(puS->local.sun_family);
 
 	  ret = connect(puS->serverSockets, (struct sockaddr *)&puS->local, puS->len);
@@ -60,43 +52,70 @@ int FIN(){
 		printf("socket failed: %d\n", errno);
 	}
 
-	printf("Client success: %d\n", success);
+	//printf("Client success: %d\n", success);
 
-	if(success){
-		FOUT();
-	}
+	return success;
+}
+
+void CloseLinuxSocketClient(ProcessingUnitStructure *pu){
+	ProcessingUnitStructureSocket *puS;
+
+	puS = (ProcessingUnitStructureSocket*)pu->p;
 
 	close(puS->serverSockets);
 
-	#ifdef DEVINIT
-	free(devices); // Free #1
-	#endif
-
-	free(pu); // Alloc #2
-	free(puS); // Alloc #3
-
-	return 0;
+	free(pu); // Free #1
+	free(puS); // Free #2
 }
 
 #include "socklib.c"
 
-void Send(ProcessingUnitStructure *pu, double *d, size_t dLength){
+void Send(ProcessingUnitStructure *pu, double *message, size_t messageLength){
 	ProcessingUnitStructureSocket *puS = (ProcessingUnitStructureSocket*)pu->p;
-	int ret;
-	double length = dLength;
+	double length = messageLength;
+	char lengthString[20];
+	uint8_t *buffer;
+	long i;
 
-	sendAll(puS->serverSockets, (uint8_t*)&length, sizeof(double));
-	sendAll(puS->serverSockets, (uint8_t*)d, dLength * sizeof(double));
+	buffer = malloc(messageLength);
+
+	for(i = 0; i < messageLength; i++){
+		buffer[i] = message[i];
+	}
+
+	sprintf(lengthString, "%15Ld", (long long)messageLength);
+
+	sendAll(puS->serverSockets, (uint8_t*)lengthString, 15);
+	sendAll(puS->serverSockets, buffer, messageLength);
+
+	free(buffer);
 }
 
-void Receive(ProcessingUnitStructure *pu, NumberArrayReference *d){
+void Receive(ProcessingUnitStructure *pu, NumberArrayReference *message){
 	ProcessingUnitStructureSocket *puS = (ProcessingUnitStructureSocket*)pu->p;
 	double length;
+	char lengthStr[15];
+	_Bool success;
+	uint8_t *buffer;
+	long i;
 
-	recvAll(puS->serverSockets, (uint8_t*)&length, sizeof(double));
-	d->numberArrayLength = length;
-	d->numberArray = malloc(d->numberArrayLength * sizeof(double));
-	recvAll(puS->serverSockets, (uint8_t*)d->numberArray, d->numberArrayLength * sizeof(double));
+	success = recvAll(puS->serverSockets, (uint8_t*)lengthStr, 15);
+
+	if(success){
+		length = atof(lengthStr);
+	}
+
+	message->numberArrayLength = length;
+	message->numberArray = malloc(message->numberArrayLength * sizeof(double));
+
+	buffer = malloc(length);
+	recvAll(puS->serverSockets, buffer, length);
+
+	for(i = 0; i < length; i++){
+		message->numberArray[i] = buffer[i];
+	}
+
+	free(buffer);
 }
 
 bool Check(ProcessingUnitStructure *pu){
