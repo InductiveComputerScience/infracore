@@ -24,7 +24,7 @@ Device interfaces, drivers and compositions.
  * audio
    * [Demo1](examples/audio-demo1) -- Sending a pure C sine wave to an audio device.
  * clock
-   * [Demo1](examples/clock-demo1) -- Prints the current time on screen, waits a second, and writes the time again.
+   * [Demo1](examples/clock-demo1) -- Prints the current time on screen, waits a second, and prints the time again.
 
 ## How to
 An infracore program consist of a function that takes the devices it uses as input. For example, a game needs a screen to display the game, an audio device to play sound, a clock to keep track of time and a disk for the game data:
