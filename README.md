@@ -8,7 +8,7 @@ Device interfaces, drivers and compositions.
  * disk - [interface](devices/disk/Disk.h)
 
 ## Drivers
- * screen
+ * screen and keyboard
    * [SDL Driver](drivers/screen-linux-sdl)
  * audio
    * [ALSA Driver](drivers/audio-linux-alsa/)
@@ -19,12 +19,12 @@ Device interfaces, drivers and compositions.
 
 
 ## Examples
- * screen
-   * [Demo1](examples/screen-demo1) -- Drawing pixels to a screen.
+ * screen and keyboard
+   * [Demo1](examples/screen-demo1/program.c) -- Drawing pixels to a screen.
  * audio
-   * [Demo1](examples/audio-demo1) -- Sending a pure C sine wave to an audio device.
+   * [Demo1](examples/audio-demo1/program.c) -- Sending a pure C sine wave to an audio device.
  * clock
-   * [Demo1](examples/clock-demo1) -- Prints the current time on screen, waits a second, and prints the time again.
+   * [Demo1](examples/clock-demo1/program.c) -- Prints the current time on screen, waits a second, and prints the time again.
 
 ## How to
 An infracore program consist of a function that takes the devices it uses as input. For example, a game needs a screen to display the game, an audio device to play sound, a clock to keep track of time and a disk for the game data:
