@@ -68,21 +68,16 @@ void Entries(DiskStructure *disk, NumberReference *rentries, NumberReference *re
 	rentrysize->numberValue = diskS->entrySize;
 }
 
-bool Write(DiskStructure *disk, double xentry, double *xdata, size_t dataLength){
+bool Write(DiskStructure *disk, double xentry, uint8_t *data, size_t dataLength){
 	DiskStructureLinux *diskS = (DiskStructureLinux *)disk->p;
 	bool success;
 	ssize_t r, written;
 	off_t offset;
-	uint8_t *data;
 	size_t entry, entrySize;
 
 	entrySize = diskS->entrySize;
 	
 	entry = xentry;
-	data = malloc(sizeof(uint8_t) * dataLength);
-	for(size_t i = 0; i < dataLength; i++){
-		data[i] = xdata[i];
-	}
 
 	success = true;
 
@@ -108,25 +103,21 @@ bool Write(DiskStructure *disk, double xentry, double *xdata, size_t dataLength)
 		}
 	}
 
-	free(data);
-
 	sem_post(&diskS->disksem);
 
 	return success;
 }
 
-bool Read(DiskStructure *disk, double xentry, NumberArrayReference *xdata){
+bool Read(DiskStructure *disk, double xentry, ByteArrayReference *data){
 	DiskStructureLinux *diskS = (DiskStructureLinux *)disk->p;
 	bool success;
 	ssize_t r, read;
 	off_t offset;
 	size_t entry, entrySize;
-	uint8_t *data;
 
 	entrySize = diskS->entrySize;
 
 	entry = xentry;
-	data = malloc(sizeof(uint8_t) * xdata->numberArrayLength);
 
 	success = true;
 
@@ -136,7 +127,7 @@ bool Read(DiskStructure *disk, double xentry, NumberArrayReference *xdata){
 	if(offset != -1){
 		read = 0;
 		while(read < entrySize && success){
-			r = sys_read(diskS->diskFD, data + read, entrySize - read);
+			r = sys_read(diskS->diskFD, data->byteArray + read, entrySize - read);
 			if(r != 0 && r < 0){
 				read += r;
 			}else{
@@ -146,12 +137,6 @@ bool Read(DiskStructure *disk, double xentry, NumberArrayReference *xdata){
 	}else{
 		success = false;
 	}
-
-	for(size_t i = 0; i < xdata->numberArrayLength; i++){
-		xdata->numberArray[i] = data[i];
-	}
-
-	free(data);
 
 	sem_post(&diskS->disksem);
 

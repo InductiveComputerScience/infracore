@@ -17,6 +17,16 @@ struct NumberArrayReference{
   size_t numberArrayLength;
 };
 typedef struct NumberArrayReference NumberArrayReference;
+#endif
+
+#ifndef ByteArrayRefH
+#define ByteArrayRefH
+
+struct ByteArrayReference{
+  uint8_t *byteArray;
+  size_t byteArrayLength;
+};
+typedef struct ByteArrayReference ByteArrayReference;
 
 #endif
 
@@ -33,7 +43,7 @@ struct DiskServerStructure{
 typedef struct DiskServerStructure DiskServerStructure;
 
 void Entries(DiskStructure *disk, NumberReference *entries, NumberReference *entrysize);
-_Bool Write(DiskStructure *disk, double entry, double *data, size_t dataLength);
-_Bool Read(DiskStructure *disk, double entry, NumberArrayReference *data);
+_Bool Write(DiskStructure *disk, double entry, uint8_t *data, size_t dataLength);
+_Bool Read(DiskStructure *disk, double entry, ByteArrayReference *data);
 
 #endif

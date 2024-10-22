@@ -11,7 +11,7 @@
 void Program(DiskStructure *disk){
 	NumberReference entries, entrysize;
 	_Bool success;
-	NumberArrayReference data;
+	ByteArrayReference data;
 	int i;
 	char str[100];
 
@@ -19,19 +19,20 @@ void Program(DiskStructure *disk){
 
 	printf("Disk size: %ld bytes\n", (long)(entries.numberValue * entrysize.numberValue));
 
-	data.numberArrayLength = entries.numberValue * entrysize.numberValue;
-	data.numberArray = malloc(sizeof(double*) * data.numberArrayLength);
+	// Allocate for a block:
+	data.byteArrayLength = entries.numberValue * entrysize.numberValue;
+	data.byteArray = malloc(data.byteArrayLength);
 
 	success = Read(disk, 0, &data);
 
 	for(i = 0; i < 13; i++){
-		str[i] = (char)data.numberArray[i];
+		str[i] = (char)data.byteArray[i];
 	}
 	str[i] = 0;
 
 	printf("Disk contents first 13 characters: %s\n", str);
 
-	free(data.numberArray);
+	free(data.byteArray);
 }
 
 
