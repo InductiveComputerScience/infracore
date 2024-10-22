@@ -22,6 +22,7 @@ void toggleFullScreen(SDL_Window* window, bool currentState){
 }
 
 struct ScreenStructureLinuxSDL{
+	uint32_t *pixelsStart;
 	uint32_t *pixels;
 	sem_t semVSync;
 	bool quit;
@@ -122,7 +123,8 @@ _Bool CreateScreenLinuxSDL(ScreenStructure **screen, int64_t w, int64_t h, doubl
 
   screenS->renderer = SDL_CreateRenderer(screenS->window, -1, SDL_RENDERER_PRESENTVSYNC);
   screenS->texture = SDL_CreateTexture(screenS->renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, screenS->width, screenS->height);
-  screenS->pixels = malloc(screenS->width * screenS->height * sizeof(uint32_t));
+  screenS->pixelsStart = malloc(screenS->width * screenS->height * sizeof(uint32_t));
+	screenS->pixels = screenS->pixelsStart;
   memset(screenS->pixels, 0, screenS->width * screenS->height * sizeof(Uint32));
 
 	pthread_create(&screenS->thread_id, NULL, ScreenDriverThread, screenS);
@@ -140,7 +142,7 @@ _Bool CloseScreenLinuxSDL(ScreenStructure *screen){
 	screenS->quit = true;
 	pthread_join(screenS->thread_id, NULL);
 
-  free(screenS->pixels);
+	free(screenS->pixelsStart);
   SDL_DestroyTexture(screenS->texture);
   SDL_DestroyRenderer(screenS->renderer);
   SDL_DestroyWindow(screenS->window);
@@ -584,7 +586,7 @@ void ScreenSpecs(ScreenStructure *screen, double *rwidth, double *rheight, doubl
 	*rdensity = screenS->density;
 }
 
-void Display(ScreenStructure *screen, double *rpixels){
+void DisplayProgsbase(ScreenStructure *screen, double *rpixels){
 	int x, y, r, g, b, p;
 	ScreenStructureLinuxSDL *screenS;
 
@@ -601,7 +603,7 @@ void Display(ScreenStructure *screen, double *rpixels){
 	}
 }
 
-void DisplayBytes(ScreenStructure *screen, uint32_t *rpixels){
+void Display(ScreenStructure *screen, uint32_t *rpixels){
 	int x, y, r, g, b, p;
 	ScreenStructureLinuxSDL *screenS;
 
