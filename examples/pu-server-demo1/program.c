@@ -8,8 +8,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-// Test on linux:
+// Test on Linux: Sockets:
 // echo "              2hi" | nc -U socketfile
+// Test on Linux: TCP:
+// echo "              2hi" | nc 127.0.0.2 32343
 
 void Program(ProcessingUnitServerStructure *pu){
 	ByteArrayReference message;
