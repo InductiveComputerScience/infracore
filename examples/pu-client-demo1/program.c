@@ -9,25 +9,21 @@
 #include <stdio.h>
 
 void Program(ProcessingUnitStructure *pu){
-	NumberArrayReference message;
+	ByteArrayReference message;
 	char c;
-	double *d;
 	size_t dLength;
 	char *str = "Hello, world!";
 	long i;
 
-	dLength = strlen(str);
-	d = malloc(dLength * sizeof(double));
-	for(i = 0; i < dLength; i++){
-		d[i] = str[i];
-	}
-
-	Send(pu, d, dLength);
+	Send(pu, (uint8_t*)str, strlen(str));
 	Receive(pu, &message);
 
+	// Equivalently:
+	// Call(pu, (uint8_t*)str, strlen(str), &message);
+
 	printf("Response:\n");
-	for(i = 0; i < message.numberArrayLength; i++){
-		printf("%c", (char)message.numberArray[i]);
+	for(i = 0; i < message.byteArrayLength; i++){
+		printf("%c", (char)message.byteArray[i]);
 	}
 	printf("\n");
 }

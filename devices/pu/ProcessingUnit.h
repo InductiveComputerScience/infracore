@@ -20,6 +20,17 @@ typedef struct NumberArrayReference NumberArrayReference;
 
 #endif
 
+#ifndef ByteArrayRefH
+#define ByteArrayRefH
+
+struct ByteArrayReference{
+  uint8_t *byteArray;
+  size_t byteArrayLength;
+};
+typedef struct ByteArrayReference ByteArrayReference;
+
+#endif
+
 struct ProcessingUnitStructure{
 	void *p;
 };
@@ -33,14 +44,14 @@ struct ProcessingUnitServerStructure{
 typedef struct ProcessingUnitServerStructure ProcessingUnitServerStructure;
 
 // Processing Unit Instructions
-void Call(ProcessingUnitStructure *pu, double *s, size_t sLength, NumberArrayReference *r);
+void Call(ProcessingUnitStructure *pu, uint8_t *s, size_t sLength, ByteArrayReference *r);
 
-void Send(ProcessingUnitStructure *pu, double *d, size_t dLength);
+void Send(ProcessingUnitStructure *pu, uint8_t *d, size_t dLength);
 bool Check(ProcessingUnitStructure *pu);
-void Receive(ProcessingUnitStructure *pu, NumberArrayReference *d);
+void Receive(ProcessingUnitStructure *pu, ByteArrayReference *d);
 
-void ServerSend(ProcessingUnitServerStructure *pu, double *message, size_t messageLength);
+void ServerSend(ProcessingUnitServerStructure *pu, uint8_t *message, size_t messageLength);
 bool ServerCheck(ProcessingUnitServerStructure *pu);
-void ServerReceive(ProcessingUnitServerStructure *pu, NumberArrayReference *message);
+void ServerReceive(ProcessingUnitServerStructure *pu, ByteArrayReference *message);
 
 #endif

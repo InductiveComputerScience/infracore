@@ -70,34 +70,30 @@ void CloseLinuxSocketClient(ProcessingUnitStructure *pu){
 
 #include "socklib.c"
 
-void Send(ProcessingUnitStructure *pu, double *message, size_t messageLength){
-	ProcessingUnitStructureSocket *puS = (ProcessingUnitStructureSocket*)pu->p;
+void Send(ProcessingUnitStructure *pu, uint8_t *message, size_t messageLength){
+	ProcessingUnitStructureSocket *puS;
 	double length = messageLength;
 	char lengthString[20];
 	uint8_t *buffer;
 	long i;
 
-	buffer = malloc(messageLength);
-
-	for(i = 0; i < messageLength; i++){
-		buffer[i] = message[i];
-	}
+	puS = (ProcessingUnitStructureSocket*)pu->p;
 
 	sprintf(lengthString, "%15Ld", (long long)messageLength);
 
 	sendAll(puS->serverSockets, (uint8_t*)lengthString, 15);
-	sendAll(puS->serverSockets, buffer, messageLength);
-
-	free(buffer);
+	sendAll(puS->serverSockets, message, messageLength);
 }
 
-void Receive(ProcessingUnitStructure *pu, NumberArrayReference *message){
-	ProcessingUnitStructureSocket *puS = (ProcessingUnitStructureSocket*)pu->p;
+void Receive(ProcessingUnitStructure *pu, ByteArrayReference *message){
+	ProcessingUnitStructureSocket *puS;
 	double length;
 	char lengthStr[15];
 	_Bool success;
 	uint8_t *buffer;
 	long i;
+
+	puS = (ProcessingUnitStructureSocket*)pu->p;
 
 	success = recvAll(puS->serverSockets, (uint8_t*)lengthStr, 15);
 
@@ -105,17 +101,10 @@ void Receive(ProcessingUnitStructure *pu, NumberArrayReference *message){
 		length = atof(lengthStr);
 	}
 
-	message->numberArrayLength = length;
-	message->numberArray = malloc(message->numberArrayLength * sizeof(double));
+	message->byteArrayLength = length;
+	message->byteArray = malloc(message->byteArrayLength);
 
-	buffer = malloc(length);
-	recvAll(puS->serverSockets, buffer, length);
-
-	for(i = 0; i < length; i++){
-		message->numberArray[i] = buffer[i];
-	}
-
-	free(buffer);
+	recvAll(puS->serverSockets, message->byteArray, length);
 }
 
 bool Check(ProcessingUnitStructure *pu){
@@ -125,7 +114,7 @@ bool Check(ProcessingUnitStructure *pu){
 	return count > 0;
 }
 
-void Call(ProcessingUnitStructure *pu, double *s, size_t sLength, NumberArrayReference *d){
+void Call(ProcessingUnitStructure *pu, uint8_t *s, size_t sLength, ByteArrayReference *d){
 	Send(pu, s, sLength);
 	Receive(pu, d);
 }

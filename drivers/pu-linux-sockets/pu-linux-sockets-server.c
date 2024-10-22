@@ -118,25 +118,15 @@ _Bool EnableKeepalive(int sock){
 
 #include "socklib.c"
 
-void ServerSend(ProcessingUnitServerStructure *pu, double *message, size_t messageLength){
+void ServerSend(ProcessingUnitServerStructure *pu, uint8_t *message, size_t messageLength){
 	ProcessingUnitServerStructureSocket *puS = (ProcessingUnitServerStructureSocket*)pu->p;
-	double length = messageLength;
 	char lengthString[20];
-	uint8_t *buffer;
 	long i;
-
-	buffer = malloc(messageLength);
-
-	for(i = 0; i < messageLength; i++){
-		buffer[i] = message[i];
-	}
 
 	sprintf(lengthString, "%15Ld", (long long)messageLength);
 
 	sendAll(puS->clientSocket, (uint8_t*)lengthString, 15);
-	sendAll(puS->clientSocket, buffer, messageLength);
-
-	free(buffer);
+	sendAll(puS->clientSocket, message, messageLength);
 }
 
 _Bool DoAcceptConnect(ProcessingUnitServerStructureSocket *puS){
@@ -156,13 +146,15 @@ _Bool DoAcceptConnect(ProcessingUnitServerStructureSocket *puS){
 	return success;
 }
 
-void ServerReceive(ProcessingUnitServerStructure *pu, NumberArrayReference *message){
-	ProcessingUnitServerStructureSocket *puS = (ProcessingUnitServerStructureSocket*)pu->p;
+void ServerReceive(ProcessingUnitServerStructure *pu, ByteArrayReference *message){
+	ProcessingUnitServerStructureSocket *puS;
 	double length;
 	char lengthStr[15];
 	_Bool success;
 	uint8_t *buffer;
 	long i;
+
+	puS = (ProcessingUnitServerStructureSocket*)pu->p;
 
 	if(!puS->connected){
 		success = DoAcceptConnect(puS);
@@ -180,17 +172,10 @@ void ServerReceive(ProcessingUnitServerStructure *pu, NumberArrayReference *mess
 		length = atof(lengthStr);
 	}
 
-	message->numberArrayLength = length;
-	message->numberArray = malloc(message->numberArrayLength * sizeof(double));
+	message->byteArrayLength = length;
+	message->byteArray = malloc(message->byteArrayLength);
 
-	buffer = malloc(length);
-	recvAll(puS->clientSocket, buffer, length);
-
-	for(i = 0; i < length; i++){
-		message->numberArray[i] = buffer[i];
-	}
-
-	free(buffer);
+	recvAll(puS->clientSocket, message->byteArray, length);
 }
 
 

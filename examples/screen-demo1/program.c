@@ -25,7 +25,7 @@ void Program(ScreenStructure *screen, KeyboardStructure *keyboard){
 	pixels = malloc(4 * w * h);
 	memset(pixels, 0, 4 * w * h);
 
-	// Keyaboard
+	// Keyboard
 	GetKeyboardSpecs(keyboard, &characters, &controlKeys, &historyMaxLength);
 	history = malloc(historyMaxLength*sizeof(double));
 	state = malloc(historyMaxLength*sizeof(bool));
