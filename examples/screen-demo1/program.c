@@ -8,7 +8,7 @@ void DrawPixel(uint32_t *pixels, int w, int x, int y, int r, int g, int b){
 	pixels[y*w + x] = r << 16 | g << 8 | b;
 }
 
-void Program(ScreenStructure *screen1, KeyboardStructure *keyboard1){
+void Program(ScreenStructure *screen, KeyboardStructure *keyboard){
 	double w, h, d;
 	uint32_t *pixels;
 
@@ -21,12 +21,12 @@ void Program(ScreenStructure *screen1, KeyboardStructure *keyboard1){
 	int counter;
 
 	// Screen
-	ScreenSpecs(screen1, &w, &h, &d);
+	ScreenSpecs(screen, &w, &h, &d);
 	pixels = malloc(4 * w * h);
 	memset(pixels, 0, 4 * w * h);
 
 	// Keyaboard
-	GetKeyboardSpecs(keyboard1, &characters, &controlKeys, &historyMaxLength);
+	GetKeyboardSpecs(keyboard, &characters, &controlKeys, &historyMaxLength);
 	history = malloc(historyMaxLength*sizeof(double));
 	state = malloc(historyMaxLength*sizeof(bool));
 
@@ -34,7 +34,7 @@ void Program(ScreenStructure *screen1, KeyboardStructure *keyboard1){
 	done = false;
 	for(counter = 0; !done; counter++){
 		// Get Keyboard State
-		GetKeyboardState(keyboard1, history, state, &length);
+		GetKeyboardState(keyboard, history, state, &length);
 
 		// Exit if ESC pressed
 		for(int j = 0; j < length; j++){
@@ -47,8 +47,8 @@ void Program(ScreenStructure *screen1, KeyboardStructure *keyboard1){
 		DrawPixel(pixels, w, fmod(counter * 7, w), fmod(counter *11, h), 255, 255, 255);
 
 		// Display Image
-		Display(screen1, pixels);
-		Synchronize(screen1);
+		Display(screen, pixels);
+		Synchronize(screen);
 	}
 
 	// Free
