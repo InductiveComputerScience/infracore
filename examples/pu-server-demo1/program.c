@@ -7,6 +7,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <unistd.h>
 
 // Test on Linux: Sockets:
 // echo "              2hi" | nc -U socketfile
@@ -38,6 +39,8 @@ void Program(ProcessingUnitServerStructure *pu){
 
 	// Respond:
 	ServerSend(pu, message.byteArray, message.byteArrayLength);
+
+	sleep(1);
 }
 
 

@@ -66,6 +66,9 @@ bool CreateLinuxTCPServer(ProcessingUnitServerStructure **pu, char *ip, int port
 
 	puS->listenSocket = socket(AF_INET, SOCK_STREAM, 0);
 
+	int val = 1;
+	setsockopt(puS->listenSocket, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(int));
+
 	if(puS->listenSocket != -1){
     bzero(&puS->local, sizeof(puS->local));
 
@@ -125,29 +128,16 @@ void *ServerThread(void *pu){
 
 	puS->done = false;
 	while(!puS->done){
-		// Not sending
-		puS->sending = false;
-		puS->sendSuccess = false;
-
-		// Connect if not connected.
+		// Accept new connection.
 		if(!puS->connected){
 			puS->clientSocket = accept(puS->listenSocket, (struct sockaddr *)&(puS->remote), &puS->len);
 			if(puS->clientSocket != -1){
-				success = EnableKeepalive(puS->clientSocket);
-				if(success){
-					puS->connected = true;
-				}else{
-					fprintf(stderr, "error enabling keep alive: %d\n", errno);
-				}
+				success = true;
+				puS->connected = true;
+				EnableKeepalive(puS->clientSocket);
 			}else{
 				success = false;
 				fprintf(stderr, "accept failed: %d\n", errno);
-			}
-
-			if(ret == 0){
-				puS->connected = true;
-			}else{
-				printf("Connect failed\n");
 				puS->connected = false;
 				sleep(1);
 			}
@@ -155,14 +145,13 @@ void *ServerThread(void *pu){
 
 		if(puS->connected && !puS->done){
 			// Receive
-			success = recvAll(puS->listenSocket, (uint8_t*)lengthString, 15);
+			success = recvAll(puS->clientSocket, (uint8_t*)lengthString, 15);
 
 			if(success){
 				puS->messageLength = atof(lengthString);
 
 				puS->message = malloc(puS->messageLength);
 
-				success = recvAll(puS->listenSocket, puS->message, puS->messageLength);
 				if(success){
 					sem_post(&puS->recvrdy);
 
@@ -174,9 +163,9 @@ void *ServerThread(void *pu){
 					if(!puS->done){
 						sprintf(lengthString, "%15Ld", (long long)puS->messageLength);
 
-						success = sendAll(puS->listenSocket, (uint8_t*)lengthString, 15);
+						success = sendAll(puS->clientSocket, (uint8_t*)lengthString, 15);
 						if(success){
-							success = sendAll(puS->listenSocket, puS->message, puS->messageLength);
+							success = sendAll(puS->clientSocket, puS->message, puS->messageLength);
 						}
 
 						puS->sending = false;
@@ -185,6 +174,12 @@ void *ServerThread(void *pu){
 				}
 			}
 		}
+	}
+
+	// If connected, disconnect.
+	if(puS->connected){
+		close(puS->clientSocket);
+		puS->connected = false;
 	}
 }
 
@@ -198,11 +193,12 @@ void CloseLinuxTCPServer(ProcessingUnitServerStructure *pu){
 	sem_post(&puS->recvrdy);
 	sem_post(&puS->sendrdy);
 
-	// If connected, disconnect.
+	// If connected, shut down connection.
 	if(puS->connected){
-		close(puS->listenSocket);
-		puS->connected = false;
+		shutdown(puS->clientSocket, SHUT_RDWR);
 	}
+
+	close(puS->listenSocket);
 
 	pthread_join(puS->serverThread, NULL);
 
