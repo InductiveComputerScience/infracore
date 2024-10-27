@@ -152,6 +152,7 @@ void *ServerThread(void *pu){
 
 				puS->message = malloc(puS->messageLength);
 
+				success = recvAll(puS->clientSocket, puS->message, puS->messageLength);
 				if(success){
 					sem_post(&puS->recvrdy);
 
