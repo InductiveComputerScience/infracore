@@ -29,11 +29,12 @@ struct ProcessingUnitStructureTCP{
 	sem_t sendrdy, recvrdy;
 	uint8_t *message;
 	size_t messageLength;
+	bool done;
 };
 
 typedef struct ProcessingUnitStructureTCP ProcessingUnitStructureTCP;
 
-void *TCPLoop(void *pu);
+void *ClientThread(void *pu);
 
 bool CreateLinuxTCPClient(ProcessingUnitStructure **pu, char *ip, int port){
 	ProcessingUnitStructureTCP *puS;
@@ -64,7 +65,7 @@ bool CreateLinuxTCPClient(ProcessingUnitStructure **pu, char *ip, int port){
 		puS->sendSuccess = false;
 
 		// Start client thread
-		ret = pthread_create(&puS->clientThread, NULL, TCPLoop, puS);
+		ret = pthread_create(&puS->clientThread, NULL, ClientThread, puS);
 		if(ret == 0){
 			success = true;
 		}else{
@@ -79,17 +80,16 @@ bool CreateLinuxTCPClient(ProcessingUnitStructure **pu, char *ip, int port){
 	return success;
 }
 
-void *TCPLoop(void *pu){
+void *ClientThread(void *pu){
 	ProcessingUnitStructureTCP *puS;
-	bool done;
 	int ret;
 	char lengthString[20];
 	bool success;
 
 	puS = (ProcessingUnitStructureTCP*)pu;
 
-	done = false;
-	while(!done){
+	puS->done = false;
+	while(!puS->done){
 		// Not sending
 		puS->sending = false;
 		puS->sendSuccess = false;
@@ -101,47 +101,43 @@ void *TCPLoop(void *pu){
 			if(ret == 0){
 				puS->connected = true;
 			}else{
+				printf("Connect failed\n");
 				puS->connected = false;
+				sleep(1);
 			}
 		}
 
-		if(puS->connected){
+		if(puS->connected && !puS->done){
 			// Send
 			sem_wait(&puS->sendrdy);
 
-			sprintf(lengthString, "%15Ld", (long long)puS->messageLength);
+			if(!puS->done){
+				sprintf(lengthString, "%15Ld", (long long)puS->messageLength);
 
-			sendAll(puS->serverSockets, (uint8_t*)lengthString, 15);
-			sendAll(puS->serverSockets, puS->message, puS->messageLength);
+				success = sendAll(puS->serverSockets, (uint8_t*)lengthString, 15);
+				if(success){
+					success = sendAll(puS->serverSockets, puS->message, puS->messageLength);
+				}
 
-			puS->sendSuccess = true;
-			puS->sending = false;
+				puS->sendSuccess = true;
+				puS->sending = false;
 
-			// Receive
-			success = recvAll(puS->serverSockets, (uint8_t*)lengthString, 15);
+				// Receive
+				success = recvAll(puS->serverSockets, (uint8_t*)lengthString, 15);
 
-			if(success){
-				puS->messageLength = atof(lengthString);
+				if(success){
+					puS->messageLength = atof(lengthString);
+
+					puS->message = malloc(puS->messageLength);
+
+					success = recvAll(puS->serverSockets, puS->message, puS->messageLength);
+					if(success){
+						sem_post(&puS->recvrdy);
+					}
+				}
 			}
-
-			puS->message = malloc(puS->messageLength);
-
-			recvAll(puS->serverSockets, puS->message, puS->messageLength);
-
-			sem_post(&puS->recvrdy);
 		}
 	}
-
-	// If connected, disconnect.
-	if(puS->connected){
-		close(puS->serverSockets);
-		puS->connected = false;
-
-		sem_destroy(&puS->sendrdy);
-		sem_destroy(&puS->recvrdy);
-	}
-
-	pthread_exit(NULL);
 }
 
 void CloseLinuxTCPClient(ProcessingUnitStructure *pu){
@@ -149,7 +145,21 @@ void CloseLinuxTCPClient(ProcessingUnitStructure *pu){
 
 	puS = (ProcessingUnitStructureTCP*)pu->p;
 
-	close(puS->serverSockets);
+	puS->done = true;
+
+	sem_post(&puS->recvrdy);
+	sem_post(&puS->sendrdy);
+
+	// If connected, disconnect.
+	if(puS->connected){
+		close(puS->serverSockets);
+		puS->connected = false;
+	}
+
+	pthread_join(puS->clientThread, NULL);
+
+	sem_destroy(&puS->sendrdy);
+	sem_destroy(&puS->recvrdy);
 
 	free(pu); // Free #1
 	free(puS); // Free #2
@@ -202,25 +212,4 @@ void Call(ProcessingUnitStructure *pu, uint8_t *s, size_t sLength, ByteArrayRefe
 	Send(pu, s, sLength);
 	Receive(pu, d);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
