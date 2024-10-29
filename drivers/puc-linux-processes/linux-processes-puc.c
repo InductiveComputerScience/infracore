@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <sys/wait.h>
 #include <string.h>
 #include <setjmp.h>
@@ -14,14 +15,15 @@ struct ProcessingUnitControllerProcessesStructure{
 	double programsLength;
 	pid_t *ppid; // 1 pid per program
 	pid_t *pupid; // 1 pid per PU, pid must be in PU to run
-	sigjmp_buf *sigbufs;
 };
 
 typedef struct ProcessingUnitControllerProcessesStructure ProcessingUnitControllerProcessesStructure;
 
 static void SetExceptionHandler(void (*Program)());
-void Program1Exception(int x);
-void Program2Exception(int x);
+void ProgramException(int x);
+
+static sigjmp_buf sigbuf;
+static bool wasException;
 
 void CreateProcessingUnitControllerProcesses(ProcessingUnitControllerStructure **puc, double pus, void (**programs)(), double programsLength){
 	ProcessingUnitControllerProcessesStructure *pucS;
@@ -37,21 +39,17 @@ void CreateProcessingUnitControllerProcesses(ProcessingUnitControllerStructure *
 	pucS->programsLength = programsLength;
 	pucS->ppid = (pid_t*)malloc(pus * sizeof(pid_t));
 	pucS->pupid = (pid_t*)malloc(programsLength * sizeof(pid_t));
-	pucS->sigbufs = (sigjmp_buf*)malloc(programsLength * sizeof(sigjmp_buf));
 
 	// Start PUs
 	for(i = 0; i < programsLength; i++){
 		pucS->ppid[i] = fork();
 
 		if(pucS->ppid[i] == 0){
-			//SetExceptionHandler(Program1Exception);
+			SetExceptionHandler(ProgramException);
+			wasException = false;
 			raise(SIGSTOP);
-			sret = sigsetjmp(pucS->sigbufs[i], 1); // savesigs is true
-			if(sret == 0){
-				programs[i]();
-			}else{
-				programs[i]();
-			}
+			sret = sigsetjmp(sigbuf, 1); // savesigs is true
+			programs[i]();
 			exit(0);
 		}
 		waitpid(pucS->ppid[i], NULL, WSTOPPED);
@@ -59,6 +57,12 @@ void CreateProcessingUnitControllerProcesses(ProcessingUnitControllerStructure *
 }
 
 void CloseProcessingUnitControllerProcesses(ProcessingUnitControllerStructure *puc){
+	ProcessingUnitControllerProcessesStructure *pucS;
+	pucS = (ProcessingUnitControllerProcessesStructure *)puc->p;
+
+	for(int i = 0; i < pucS->programsLength; i++){
+		kill(pucS->pupid[i], SIGKILL);
+	}
 }
 
 void GetProcessingUnitsAndPrograms(ProcessingUnitControllerStructure *puc, int64_t *rpus, int64_t *rps){
@@ -92,7 +96,7 @@ void SetProgram(ProcessingUnitControllerStructure *puc, int64_t n, int64_t p){
 	pucS->pupid[n] = pucS->ppid[p];
 }
 
-/*static void SetExceptionHandler(void (*Program)()){
+static void SetExceptionHandler(void (*Program)()){
 	struct sigaction *sa;
 
 	sa = (struct sigaction *)malloc(sizeof(struct sigaction));
@@ -106,17 +110,17 @@ void SetProgram(ProcessingUnitControllerStructure *puc, int64_t n, int64_t p){
 	sigaction(SIGSEGV, sa, NULL);
 	sigaction(SIGBUS, sa, NULL);
 	sigaction(SIGTRAP, sa, NULL);
-}*/
+}
 
-/*void Program1Exception(int x){
-	siglongjmp(sigbufs[0], 0);
-}*/
+void ProgramException(int x){
+	//printf("Got signal: %d\n", x);
+	wasException = true;
+	siglongjmp(sigbuf, 0);
+}
 
-/*void Program2Exception(int x){
-	siglongjmp(sigbufs[1], 0);
-}*/
-
-
+bool WasException(ProcessingUnitControllerStructure *puc){
+	return wasException;
+}
 
 
 

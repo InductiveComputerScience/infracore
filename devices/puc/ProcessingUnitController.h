@@ -14,7 +14,7 @@ void GetProcessingUnitsAndPrograms(ProcessingUnitControllerStructure *puc, int64
 void Start(ProcessingUnitControllerStructure *puc, int64_t n);
 void Stop(ProcessingUnitControllerStructure *puc, int64_t n);
 void SetProgram(ProcessingUnitControllerStructure *puc, int64_t n, int64_t p);
-_Bool WasException(ProcessingUnitControllerStructure *puc);
+bool WasException(ProcessingUnitControllerStructure *puc);
 
 #endif
 

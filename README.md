@@ -1,4 +1,6 @@
 # infracore.io
+A minimalist hardware abstraction layer.
+
 Device interfaces, drivers and compositions.
 
 ## Devices
