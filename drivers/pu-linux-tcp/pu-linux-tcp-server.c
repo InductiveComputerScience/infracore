@@ -58,7 +58,7 @@ bool CreateLinuxTCPServer(ProcessingUnitServerStructure **pu, char *ip, int port
 
 	// Create Structure
 	*pu = malloc(sizeof(ProcessingUnitServerStructure)); // Alloc #1
-	puS = malloc(sizeof(ProcessingUnitServerStructureTCP)); // Alloc #1
+	puS = malloc(sizeof(ProcessingUnitServerStructureTCP)); // Alloc #2
 	(*pu)->p = puS;
 
 	sem_init(&puS->sendrdy, 0, 0);
