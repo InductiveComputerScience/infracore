@@ -106,13 +106,15 @@ CloseC89File(disk1);
 
 ### Program -- Your Program
 
-An infracore program consist of a function that takes the devices it uses as input. For example, a game needs a screen to display the game, an audio device to play sound, a clock to keep track of time and a disk for the game data:
+An infracore program consist of a function that takes the devices it uses as input. For example, this program can use the screen and read data from and write data to the disk.
 
 ```
 void Program(ScreenStructure *screen1, DiskStructure *disk1){
   ...
 }
 ```
+
+Another example would be a game. It needs a screen to display the game, an audio device to play sound, a clock to keep track of time and a disk for the game data. Then you would pass the following devices to the program: screen, audio, clock and disk.
 
 ### Makefile -- Builds the Program
 Finally, the program needs to be built.
