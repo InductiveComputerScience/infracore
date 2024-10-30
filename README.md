@@ -52,6 +52,8 @@ This repo contains device interfaces, drivers and example programs.
 
 ### Screen
 
+|             | |
+| ----------- |-|
 | ScreenSpecs | |
 | Display     | |
 | Synchronize | |
