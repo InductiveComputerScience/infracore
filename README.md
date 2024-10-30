@@ -123,10 +123,10 @@ gcc -c ../../../drivers/screen-linux-sdl/screen-linux-sdl.c -I ../../../devices/
 gcc -c ../../../drivers/disk-c89-file/disk-c89-file.c -std=c89 -I ../../../devices/disk/
 
 # Launcher:
-gcc -c launcher.c -march=native -I ../../../devices/screen
+gcc -c launcher.c -I ../../../devices/screen
 
 # Program:
-gcc -c ../program.c -march=native -I ../../../devices/screen
+gcc -c ../program.c -I ../../../devices/screen
 
 # Make executable:
 gcc -o program program.o launcher.o screen-linux-sdl.o disk-c89-file.o -lm -lpthread -lSDL2 -lrt
