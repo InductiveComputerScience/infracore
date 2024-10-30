@@ -88,12 +88,48 @@ This repo contains device interfaces, drivers and example programs.
  * [WasException](https://www.progsbase.com/isa/pex/)
 
 ## How to
+
+You can clone this repository and try out any of the examples. Run `make.sh` and run `./program`. A typical program has the following parts:
+
+### Launcher -- Creates the Devices
+Initialize all the devices that your program will use. Each device is created using a device driver. In this example the SDL driver is used for the screen and a file driver is used for the disk. The screen is 640x480 and the disk is 1024 bytes, two blocks of 512 bytes, and stored in the file `disk.dat`.
+
+```
+CreateScreenLinuxSDL(&screen1, 640, 480, 1920/0.508);
+CreateC89File(&disk1, "../disk.dat", 2, 512);
+
+Program(disk1);
+
+CloseScreenLinuxSDL(screen1, disk1);
+CloseC89File(disk1);
+```
+
+### Program -- Your Program
+
 An infracore program consist of a function that takes the devices it uses as input. For example, a game needs a screen to display the game, an audio device to play sound, a clock to keep track of time and a disk for the game data:
 
 ```
-void Program(ScreenStructure *screen1, KeyboardStructure *keyboard1, AudioStructure *audio1, ClockStructure *clock1, DiskStructure *disk1){
+void Program(ScreenStructure *screen1, DiskStructure *disk1){
   ...
 }
+```
+
+### Makefile -- Builds the Program
+Finally, the program needs to be built.
+
+```
+# Drivers:
+gcc -c ../../../drivers/screen-linux-sdl/screen-linux-sdl.c -I ../../../devices/screen/
+gcc -c ../../../drivers/disk-c89-file/disk-c89-file.c -std=c89 -I ../../../devices/disk/
+
+# Launcher:
+gcc -c launcher.c -march=native -I ../../../devices/screen
+
+# Program:
+gcc -c ../program.c -march=native -I ../../../devices/screen
+
+# Make executable:
+gcc -o program program.o launcher.o screen-linux-sdl.o disk-c89-file.o -lm -lpthread -lSDL2 -lrt
 ```
 
 ## Book
