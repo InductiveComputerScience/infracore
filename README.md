@@ -52,42 +52,42 @@ This repo contains device interfaces, drivers and example programs.
 
 ### Screen
 
- * ScreenSpecs
- * Display
- * Synchronize
+| ScreenSpecs | |
+| Display     | |
+| Synchronize | |
 
 ### Keyboard
 
- * GetKeyboardSpecs
- * GetKeyboardState
+| GetKeyboardSpecs | |
+| GetKeyboardState | |
 
 ### Clock
 
- * ClockSpecs
- * CurrentTime
+| ClockSpecs  | |
+| CurrentTime | |
 
 ### Disk
 
- * Entries
- * Write
- * Read
+| Entries | |
+| Write   | |
+| Read    | |
 
 ### Processing Unit (PU)
 
 For both server and client:
 
- * Send
- * CheckSend
- * Receive
- * Check
+| Send       | |
+| CheckSend  | |
+| Receive    | |
+| Check      | |
 
 ### Processing Unit Controller (PUC)
 
- * GetProcessingUnitsAndPrograms
- * Start
- * Stop
- * SetProgram
- * WasException
+| GetProcessingUnitsAndPrograms | |
+| Start                         | |
+| Stop                          | |
+| SetProgram                    | |
+| WasException                  | |
 
 ## How to
 An infracore program consist of a function that takes the devices it uses as input. For example, a game needs a screen to display the game, an audio device to play sound, a clock to keep track of time and a disk for the game data:
