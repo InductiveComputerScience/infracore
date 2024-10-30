@@ -52,44 +52,40 @@ This repo contains device interfaces, drivers and example programs.
 
 ### Screen
 
-|             | |
-| ----------- |-|
-| ScreenSpecs | |
-| Display     | |
-| Synchronize | |
+ * [ScreenSpecs](https://www.progsbase.com/isa/spc/)
+ * [Display](https://www.progsbase.com/isa/sdsp/)
+ * [Synchronize](https://www.progsbase.com/isa/syn/)
 
 ### Keyboard
 
-| GetKeyboardSpecs | |
-| GetKeyboardState | |
+ * [GetKeyboardSpecs](https://www.progsbase.com/isa/ksp/)
+ * [GetKeyboardState](https://www.progsbase.com/isa/kst/)
 
 ### Clock
 
-| ClockSpecs  | |
-| CurrentTime | |
+ * [ClockSpecs](https://www.progsbase.com/isa/csp/)
+ * [CurrentTime](https://www.progsbase.com/isa/ctm/)
 
 ### Disk
 
-| Entries | |
-| Write   | |
-| Read    | |
+ * [Entries](https://www.progsbase.com/isa/dsp/)
+ * [Write](https://www.progsbase.com/isa/dwr/)
+ * [Read](https://www.progsbase.com/isa/drd/)
 
 ### Processing Unit (PU)
 
-For both server and client:
-
-| Send       | |
-| CheckSend  | |
-| Receive    | |
-| Check      | |
+ * [Send](https://www.progsbase.com/isa/snd/) | [ServerSend](https://www.progsbase.com/isa/srv-snd/)
+ * [CheckSend](https://www.progsbase.com/isa/chs/) | [ServerCheckSend](https://www.progsbase.com/isa/srv-chs/)
+ * [Receive](https://www.progsbase.com/isa/rcv/) | [ServerReceive](https://www.progsbase.com/isa/srv-rcv/)
+ * [Check](https://www.progsbase.com/isa/chk/) | [ServerCheck](https://www.progsbase.com/isa/srv-chk/)
 
 ### Processing Unit Controller (PUC)
 
-| GetProcessingUnitsAndPrograms | |
-| Start                         | |
-| Stop                          | |
-| SetProgram                    | |
-| WasException                  | |
+ * [GetProcessingUnitsAndPrograms](https://www.progsbase.com/isa/psp/)
+ * [Start](https://www.progsbase.com/isa/psta/)
+ * [Stop](https://www.progsbase.com/isa/pstp/)
+ * [SetProgram](https://www.progsbase.com/isa/pse/)
+ * [WasException](https://www.progsbase.com/isa/pex/)
 
 ## How to
 An infracore program consist of a function that takes the devices it uses as input. For example, a game needs a screen to display the game, an audio device to play sound, a clock to keep track of time and a disk for the game data:
