@@ -1,14 +1,18 @@
 # infracore.io
-A minimalist hardware abstraction layer.
+A minimalist hardware abstraction layer. 
 
-Device interfaces, drivers and compositions.
+It separates hardware into seven different devices with only a few API functions each. Everything the computer can do should be possible with just these API functions. Experience the joy of programming with an easily underatandable API.
+
+This repo contains device interfaces, drivers and example programs.
 
 ## Devices
  * screen - [interface](devices/screen/Screen.h)
+ * keyboard - [interface](devices/screen/Keyboard.h)
  * audio - [interface](devices/audio/Audio.h)
  * clock - [interface](devices/clock/Clock.h)
  * disk - [interface](devices/disk/Disk.h)
- * processing unit - [interface](devices/pu/ProcessingUnit.h)
+ * processing unit (PU) - [interface](devices/pu/ProcessingUnit.h)
+ * processing unit controller (PUC) - [interface](devices/puc/ProcessingUnitController.h)
 
 ## Drivers
  * screen and keyboard
@@ -43,6 +47,47 @@ Device interfaces, drivers and compositions.
    * [Demo1](examples/puc-demo1/program.c) -- Run two programs in two processing units.
    * [Demo2](examples/puc-demo2/program.c) -- Restart on exception.
    * [Demo3](examples/puc-demo3/program.c) -- Running multiple programs but not using more than one CPU.
+
+## API Functions
+
+### Screen
+
+ * ScreenSpecs
+ * Display
+ * Synchronize
+
+### Keyboard
+
+ * GetKeyboardSpecs
+ * GetKeyboardState
+
+### Clock
+
+ * ClockSpecs
+ * CurrentTime
+
+### Disk
+
+ * Entries
+ * Write
+ * Read
+
+### Processing Unit (PU)
+
+For both server and client:
+
+ * Send
+ * CheckSend
+ * Receive
+ * Check
+
+### Processing Unit Controller (PUC)
+
+ * GetProcessingUnitsAndPrograms
+ * Start
+ * Stop
+ * SetProgram
+ * WasException
 
 ## How to
 An infracore program consist of a function that takes the devices it uses as input. For example, a game needs a screen to display the game, an audio device to play sound, a clock to keep track of time and a disk for the game data:
