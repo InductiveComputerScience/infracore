@@ -89,7 +89,9 @@ This repo contains device interfaces, drivers and example programs.
 
 ## How to
 
-You can clone this repository and try out any of the examples. Run `make.sh` and run `./program`. A typical program has the following parts:
+You can clone this repository and try out any of the examples. Build by running `make.sh` and then run `./program` to run the demo program.
+
+A typical program has the following parts: A launcher, a program and a build script.
 
 ### Launcher -- Creates the Devices
 Initialize all the devices that your program will use. Each device is created using a device driver. In this example the SDL driver is used for the screen and a file driver is used for the disk. The screen is 640x480 and the disk is 1024 bytes, two blocks of 512 bytes, and stored in the file `disk.dat`.
