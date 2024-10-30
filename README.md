@@ -98,9 +98,9 @@ Initialize all the devices that your program will use. Each device is created us
 CreateScreenLinuxSDL(&screen1, 640, 480, 1920/0.508);
 CreateC89File(&disk1, "../disk.dat", 2, 512);
 
-Program(disk1);
+Program(screen1, disk1);
 
-CloseScreenLinuxSDL(screen1, disk1);
+CloseScreenLinuxSDL(screen1);
 CloseC89File(disk1);
 ```
 
