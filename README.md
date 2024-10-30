@@ -121,14 +121,14 @@ Finally, the program needs to be built.
 
 ```
 # Drivers:
-gcc -c ../../../drivers/screen-linux-sdl/screen-linux-sdl.c -I ../../../devices/screen/
-gcc -c ../../../drivers/disk-c89-file/disk-c89-file.c -std=c89 -I ../../../devices/disk/
+gcc -c infracore/drivers/screen-linux-sdl/screen-linux-sdl.c -I infracore/devices/screen/
+gcc -c infracore/drivers/disk-c89-file/disk-c89-file.c -std=c89 -I infracore/devices/disk/
 
 # Launcher:
-gcc -c launcher.c -I ../../../devices/screen
+gcc -c launcher.c -I infracore/devices/screen -I infracore/devices/disk
 
 # Program:
-gcc -c ../program.c -I ../../../devices/screen
+gcc -c program.c -I infracore/devices/screen -I infracore/devices/disk
 
 # Make executable:
 gcc -o program program.o launcher.o screen-linux-sdl.o disk-c89-file.o -lm -lpthread -lSDL2 -lrt
