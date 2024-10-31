@@ -38,5 +38,5 @@ int main(){
 		returnCode = 1;
 	}
 
-	return !success;
+	return returnCode;
 }
