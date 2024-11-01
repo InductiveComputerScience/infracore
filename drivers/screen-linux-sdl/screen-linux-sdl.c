@@ -58,7 +58,7 @@ void AddKeyboardEvent(KeyboardStructureLinuxSDL *keyboardS, int code, bool state
 	}
 }
 
-_Bool CreateKeyboardLinuxSDL(KeyboardStructure **keyboard, ScreenStructure *screen){
+bool CreateKeyboardLinuxSDL(KeyboardStructure **keyboard, ScreenStructure *screen){
 	ScreenStructureLinuxSDL *screenS;
 
 	screenS = (ScreenStructureLinuxSDL*)screen->p;
@@ -66,7 +66,7 @@ _Bool CreateKeyboardLinuxSDL(KeyboardStructure **keyboard, ScreenStructure *scre
 	*keyboard = screenS->keyboard;
 }
 
-_Bool CreateKeyboardLinuxSDLInner(KeyboardStructure **keyboard){
+bool CreateKeyboardLinuxSDLInner(KeyboardStructure **keyboard){
 	double i;
 	KeyboardStructureLinuxSDL *keyboardS;
 
@@ -89,7 +89,7 @@ _Bool CreateKeyboardLinuxSDLInner(KeyboardStructure **keyboard){
 	return true;
 }
 
-_Bool CloseKeyboardLinuxSDL(KeyboardStructure *keyboard){
+bool CloseKeyboardLinuxSDL(KeyboardStructure *keyboard){
 	KeyboardStructureLinuxSDL *keyboardS;
 
 	keyboardS = (KeyboardStructureLinuxSDL*)keyboard->p;
@@ -104,8 +104,10 @@ _Bool CloseKeyboardLinuxSDL(KeyboardStructure *keyboard){
 
 void *ScreenDriverThread(void *vargp);
 
-_Bool CreateScreenLinuxSDL(ScreenStructure **screen, int64_t w, int64_t h, double density){
+bool CreateScreenLinuxSDL(ScreenStructure **screen, int64_t w, int64_t h, double density){
 	ScreenStructureLinuxSDL *screenS;
+	int ret;
+	bool success;
 
 	*screen = malloc(sizeof(ScreenStructure));
 	screenS = malloc(sizeof(ScreenStructureLinuxSDL));
@@ -117,24 +119,45 @@ _Bool CreateScreenLinuxSDL(ScreenStructure **screen, int64_t w, int64_t h, doubl
 	screenS->height = h;
 	screenS->density = density;
 
-  SDL_Init(SDL_INIT_VIDEO);
+  ret = SDL_Init(SDL_INIT_VIDEO);
+	if(ret == 0){
+		screenS->window = SDL_CreateWindow("SDL2 Virtual Screen", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenS->width, screenS->height, 0);
+		
+		if(screenS->window != NULL){
+			screenS->renderer = SDL_CreateRenderer(screenS->window, -1, SDL_RENDERER_PRESENTVSYNC);
+			if(screenS->renderer != NULL){
+				screenS->texture = SDL_CreateTexture(screenS->renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenS->width, screenS->height);
+				if(screenS->texture != NULL){
+					screenS->pixelsStart = malloc(screenS->width * screenS->height * sizeof(uint32_t));
+					screenS->pixels = screenS->pixelsStart;
+					memset(screenS->pixels, 0, screenS->width * screenS->height * sizeof(Uint32));
 
-  screenS->window = SDL_CreateWindow("SDL2 Virtual Screen", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenS->width, screenS->height, 0);
+					pthread_create(&screenS->thread_id, NULL, ScreenDriverThread, screenS);
 
-  screenS->renderer = SDL_CreateRenderer(screenS->window, -1, SDL_RENDERER_PRESENTVSYNC);
-  screenS->texture = SDL_CreateTexture(screenS->renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, screenS->width, screenS->height);
-  screenS->pixelsStart = malloc(screenS->width * screenS->height * sizeof(uint32_t));
-	screenS->pixels = screenS->pixelsStart;
-  memset(screenS->pixels, 0, screenS->width * screenS->height * sizeof(Uint32));
+					CreateKeyboardLinuxSDLInner(&screenS->keyboard);
+					
+					success = true;
+				}else{
+					success = false;
+					printf("SDL_CreateTexture failed: %s\n", SDL_GetError());
+				}
+			}else{
+				success = false;
+				printf("SDL_CreateRenderer failed: %s\n", SDL_GetError());
+			}
+		}else{
+			success = false;
+			printf("SDL_CreateWindow failed: %s\n", SDL_GetError());
+		}
+	}else{
+		success = false;
+		printf("SDL_Init failed: %d, %s\n", ret, SDL_GetError());
+	}
 
-	pthread_create(&screenS->thread_id, NULL, ScreenDriverThread, screenS);
-
-	CreateKeyboardLinuxSDLInner(&screenS->keyboard);
-
-	return true;
+	return success;
 }
 
-_Bool CloseScreenLinuxSDL(ScreenStructure *screen){
+bool CloseScreenLinuxSDL(ScreenStructure *screen){
 	ScreenStructureLinuxSDL *screenS;
 
 	screenS = (ScreenStructureLinuxSDL*)screen->p;
@@ -163,7 +186,8 @@ void *ScreenDriverThread(void *vargp){
 
 	int count = 0, count2 = 0;
 	int last, now, hadEvent;
-	bool currenState = false;
+	bool currenState = false, success;
+	int ret;
 
   while (!screenS->quit){
 		while(hadEvent = SDL_PollEvent(&event)){
@@ -563,11 +587,27 @@ void *ScreenDriverThread(void *vargp){
 			}
 		}
 
-		SDL_UpdateTexture(screenS->texture, NULL, screenS->pixels, screenS->width * sizeof(uint32_t));
-		SDL_RenderClear(screenS->renderer);
-		SDL_RenderCopy(screenS->renderer, screenS->texture, NULL, NULL);
-		SDL_RenderPresent(screenS->renderer);
+		ret = SDL_UpdateTexture(screenS->texture, NULL, screenS->pixels, screenS->width * sizeof(uint32_t));
+		if(ret == 0){
+			ret = SDL_RenderClear(screenS->renderer);
+			if(ret == 0){
+				ret = SDL_RenderCopy(screenS->renderer, screenS->texture, NULL, NULL);
+				if(ret == 0){
+					//SDL_RenderPresent(screenS->renderer);
+				}else{
+					success = false;
+					printf("SDL_RenderCopy failed: %d, %s\n", ret, SDL_GetError());
+				}
+			}else{
+				success = false;
+				printf("SDL_RenderClear failed: %d, %s\n", ret, SDL_GetError());
+			}
+		}else{
+			success = false;
+			printf("SDL_UpdateTexture failed: %d, %s\n", ret, SDL_GetError());
+		}
 
+		usleep(16 * 1000);
 		sem_post(&screenS->semVSync);
   }
 
