@@ -52,7 +52,7 @@ void Program(ScreenStructure *screen, KeyboardStructure *keyboard){
 	}
 
 	// Free
-	free(pixels);
+	//free(pixels);
 	free(history);
 	free(state);
 }

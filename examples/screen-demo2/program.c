@@ -29,7 +29,7 @@ void Program(ScreenStructure *screen){
 	}
 
 	// Free
-	free(pixels);
+	//free(pixels);
 }
 
 
