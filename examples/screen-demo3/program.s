@@ -5,7 +5,7 @@
 .lcomm pixels, 640*480*4                       # The image to be displayed
                                                # color bytes: R, G, B, A
 screen: .quad 0                                # The pointer to the screen device
-counter: .quad 0
+counter: .quad 0                               # Loop counter variable
 
 .text                                          # Program data
 

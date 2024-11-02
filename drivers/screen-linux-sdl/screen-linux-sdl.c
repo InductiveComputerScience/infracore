@@ -620,7 +620,6 @@ void *ScreenDriverThread(void *vargp){
 				printf("SDL_UpdateTexture failed: %d, %s\n", ret, SDL_GetError());
 			}
 
-			usleep(16 * 1000);
 			sem_post(&screenS->semVSync);
 			//static int i = 0;
 			//printf("rendering %d\n", i++);
@@ -685,6 +684,8 @@ void Synchronize(ScreenStructure *screen){
 
 	screenS = (ScreenStructureLinuxSDL*)screen->p;
 
+	// At most 250 fps for those without vsync.
+	usleep(4 * 1000);
 	sem_wait(&screenS->semVSync);
 }
 
