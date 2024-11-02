@@ -6,46 +6,46 @@
 #include <stdbool.h>
 
 void Program(AudioStructure *audio1){
-	double w, h, d;
-	double *pixels, i;
+  double w, h, d;
+  double *pixels, i;
 
-	double *history;
-	double length;
-	_Bool *state;
-	double characters, controlKeys, historyMaxLength;
+  double *history;
+  double length;
+  _Bool *state;
+  double characters, controlKeys, historyMaxLength;
 
-	_Bool done;
-	int counter;
-	int cur = 0;
-	int size;
+  _Bool done;
+  int counter;
+  int cur = 0;
+  int size;
 
-	// Audio
-	double samplesps, mindelay, sw;
-	AudioSamplesMinDelay(audio1, &samplesps, &mindelay);
+  // Audio
+  double samplesps, mindelay, sw;
+  AudioSamplesMinDelay(audio1, &samplesps, &mindelay);
 
-	size = samplesps * 2;
-	double *audio = malloc(sizeof(double) * size);
+  size = samplesps * 2;
+  double *audio = malloc(sizeof(double) * size);
 
-	for(i = 0; i < size; i++){
-		double hz = 261.626;
+  for(i = 0; i < size; i++){
+    double hz = 261.626;
 
-		audio[(int)i] = sin(i/samplesps*(2*M_PI) * hz);
-	}
+    audio[(int)i] = sin(i/samplesps*(2*M_PI) * hz);
+  }
 
-	// Main loop
-	done = false;
-	for(counter = 0; !done && cur < size; counter++){
+  // Main loop
+  done = false;
+  for(counter = 0; !done && cur < size; counter++){
 
-		// Write next audio samles
-		double delay = CurrentDelay(audio1);
-		if(delay < mindelay * 1.5){
-			WriteSamples(audio1, audio + cur, fmin(mindelay, size - cur), &sw);
-			cur += sw;
-		}
-	}
+    // Write next audio samles
+    double delay = CurrentDelay(audio1);
+    if(delay < mindelay * 1.5){
+      WriteSamples(audio1, audio + cur, fmin(mindelay, size - cur), &sw);
+      cur += sw;
+    }
+  }
 
-	// Free
-	free(audio);
+  // Free
+  free(audio);
 }
 
 

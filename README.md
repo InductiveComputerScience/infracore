@@ -35,7 +35,7 @@ This repo contains device interfaces, drivers and example programs.
  * screen and keyboard
    * [Demo1](examples/screen-demo1/program.c) -- Drawing pixels to a screen, exit by pressing esc.
    * [Demo2](examples/screen-demo2/program.c) -- Drawing pixels to a screen for some seconds.
-   * [Demo3](examples/screen-demo3/program.asm) -- Drawing pixels to a screen in assembly.
+   * [Demo3](examples/screen-demo3/program-nasm.asm) -- Drawing pixels to a screen in assembly.
  * audio
    * [Demo1](examples/audio-demo1/program.c) -- Sending a pure C sine wave to an audio device.
  * clock

@@ -5,56 +5,56 @@
 #include <math.h>
 
 void DrawPixel(uint32_t *pixels, int w, int x, int y, int r, int g, int b){
-	pixels[y*w + x] = r << 16 | g << 8 | b;
+  pixels[y*w + x] = r << 16 | g << 8 | b;
 }
 
 void Program(ScreenStructure *screen, KeyboardStructure *keyboard){
-	double w, h, d;
-	uint32_t *pixels;
+  double w, h, d;
+  uint32_t *pixels;
 
-	double *history;
-	double length;
-	bool *state;
-	double characters, controlKeys, historyMaxLength;
+  double *history;
+  double length;
+  bool *state;
+  double characters, controlKeys, historyMaxLength;
 
-	_Bool done;
-	int counter;
+  _Bool done;
+  int counter;
 
-	// Screen
-	ScreenSpecs(screen, &w, &h, &d);
-	pixels = malloc(4 * w * h);
-	memset(pixels, 0, 4 * w * h);
+  // Screen
+  ScreenSpecs(screen, &w, &h, &d);
+  pixels = malloc(4 * w * h);
+  memset(pixels, 0, 4 * w * h);
 
-	// Keyboard
-	GetKeyboardSpecs(keyboard, &characters, &controlKeys, &historyMaxLength);
-	history = malloc(historyMaxLength*sizeof(double));
-	state = malloc(historyMaxLength*sizeof(bool));
+  // Keyboard
+  GetKeyboardSpecs(keyboard, &characters, &controlKeys, &historyMaxLength);
+  history = malloc(historyMaxLength*sizeof(double));
+  state = malloc(historyMaxLength*sizeof(bool));
 
-	// Main loop
-	done = false;
-	for(counter = 0; !done; counter++){
-		// Get Keyboard State
-		GetKeyboardState(keyboard, history, state, &length);
+  // Main loop
+  done = false;
+  for(counter = 0; !done; counter++){
+    // Get Keyboard State
+    GetKeyboardState(keyboard, history, state, &length);
 
-		// Exit if ESC pressed
-		for(int j = 0; j < length; j++){
-			if(history[(int)j] == -43 && state[(int)j]){
-				done = true;
-			}
-		}
+    // Exit if ESC pressed
+    for(int j = 0; j < length; j++){
+      if(history[(int)j] == -43 && state[(int)j]){
+        done = true;
+      }
+    }
 
-		// Draw Pixel
-		DrawPixel(pixels, w, fmod(counter * 7, w), fmod(counter *11, h), 255, 255, 255);
+    // Draw Pixel
+    DrawPixel(pixels, w, fmod(counter * 7, w), fmod(counter *11, h), 255, 255, 255);
 
-		// Display Image
-		Display(screen, pixels);
-		Synchronize(screen);
-	}
+    // Display Image
+    Display(screen, pixels);
+    Synchronize(screen);
+  }
 
-	// Free
-	//free(pixels);
-	free(history);
-	free(state);
+  // Free
+  //free(pixels);
+  free(history);
+  free(state);
 }
 
 
