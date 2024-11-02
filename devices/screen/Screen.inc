@@ -1,0 +1,2 @@
+extern Display
+extern Synchronize
