@@ -44,7 +44,7 @@ This repo contains device interfaces, drivers and example programs.
    * [Demo2](examples/clock-demo2/program.asm) -- Runs for 1 second. In x86-64 assembly.
  * disk
    * [Demo1](examples/disk-demo1/program.c) -- Read a string from disk and print it.
-   * [Demo1](examples/disk-demo2/program.c) -- Read a string from disk and print it in x86-64 assembly.
+   * [Demo2](examples/disk-demo2/program.c) -- Read a string from disk and print it in x86-64 assembly.
  * processing unit (PU)
    * [Server Demo1](examples/pu-server-demo1/program.c) -- Echoes the request in upper case.
    * [Client Demo1](examples/pu-client-demo1/program.c) -- Sends the message "Hello, world!" to a server.
