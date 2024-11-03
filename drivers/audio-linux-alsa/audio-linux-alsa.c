@@ -72,6 +72,7 @@ double CurrentDelay(AudioStructure *audio){
 
 void WriteSamples(AudioStructure *audio, double *samples, double length, double *samplesWritten){
 	AudioStructureLinuxAlsa *audioS;
+	int ret;
 
 	audioS = (AudioStructureLinuxAlsa*)audio->p;
 
@@ -82,7 +83,15 @@ void WriteSamples(AudioStructure *audio, double *samples, double length, double 
 		buffer[i] = samples[i] * 32768;
 	}
 	
-	*samplesWritten = snd_pcm_writei(audioS->pcm, buffer, num);
+	ret = snd_pcm_writei(audioS->pcm, buffer, num);
+
+	if(ret >= 0){
+		*samplesWritten = ret;
+	}else{
+		*samplesWritten = 0;
+	}
+}
+
 }
 
 

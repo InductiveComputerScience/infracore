@@ -6,7 +6,6 @@
 
 void Program(AudioStructure *audio1){
   double i, samplesps, mindelay, sw;
-  bool done;
   int counter, cur, size;
 
   // Audio
@@ -22,9 +21,8 @@ void Program(AudioStructure *audio1){
   }
 
   // Main loop
-  done = false;
   cur = 0;
-  for(counter = 0; !done && cur < size; counter++){
+  while(cur < size){
 
     // Write next audio samles
     double delay = CurrentDelay(audio1);
