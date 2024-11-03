@@ -1,2 +1,2 @@
-extern Display
-extern Synchronize
+extern Display         ; rdi = screen, rsi = pixels
+extern Synchronize     ; rdi = screen

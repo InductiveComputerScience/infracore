@@ -35,12 +35,13 @@ This repo contains device interfaces, drivers and example programs.
  * screen and keyboard
    * [Demo1](examples/screen-demo1/program.c) -- Drawing pixels to a screen, exit by pressing esc.
    * [Demo2](examples/screen-demo2/program.c) -- Drawing pixels to a screen for some seconds.
-   * [Demo3](examples/screen-demo3/program-nasm.asm) -- Drawing pixels to a screen in x86-64 assembly.
+   * [Demo3](examples/screen-demo3/program.asm) -- Drawing pixels to a screen in x86-64 assembly.
  * audio
    * [Demo1](examples/audio-demo1/program.c) -- Sending a pure C tone to an audio device.
    * [Demo2](examples/audio-demo2/program.asm) -- Sending a pure C tone to an audio device in x86-64 assembly.
  * clock
    * [Demo1](examples/clock-demo1/program.c) -- Prints the current time on screen, waits a second, and prints the time again.
+   * [Demo2](examples/clock-demo2/program.asm) -- Runs for 1 second. In x86-64 assembly.
  * disk
    * [Demo1](examples/disk-demo1/program.c) -- Read a string from disk and print it.
  * processing unit (PU)

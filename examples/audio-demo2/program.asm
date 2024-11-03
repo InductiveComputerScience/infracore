@@ -11,7 +11,7 @@ section .bss                              ; Global variables initialized to 0
   cur: resq 1                             ; Current position of audio samples sent to audio device
   delay: resq 1                           ; The current delay of the audio
   tmp: resq 1                             ; Temporary variable used for x87 loads
-  samplesWritten: resq 1
+  samplesWritten: resq 1                  ; Number of samples written
 
 section .rodata                           ; Read-only data
 
