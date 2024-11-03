@@ -9,30 +9,30 @@
 #include <stdio.h>
 
 void Program(DiskStructure *disk){
-	NumberReference entries, entrysize;
-	_Bool success;
-	ByteArrayReference data;
-	int i;
-	char str[100];
+  NumberReference entries, entrysize;
+  _Bool success;
+  ByteArrayReference data;
+  int i;
+  char str[100];
 
-	Entries(disk, &entries, &entrysize);
+  Entries(disk, &entries, &entrysize);
 
-	printf("Disk size: %ld bytes\n", (long)(entries.numberValue * entrysize.numberValue));
+  printf("Disk size: %ld bytes\n", (long)(entries.numberValue * entrysize.numberValue));
 
-	// Allocate for a block:
-	data.byteArrayLength = entries.numberValue * entrysize.numberValue;
-	data.byteArray = malloc(data.byteArrayLength);
+  // Allocate for a block:
+  data.byteArrayLength = entries.numberValue * entrysize.numberValue;
+  data.byteArray = malloc(data.byteArrayLength);
 
-	success = Read(disk, 0, &data);
+  success = Read(disk, 0, &data);
 
-	for(i = 0; i < 13; i++){
-		str[i] = (char)data.byteArray[i];
-	}
-	str[i] = 0;
+  for(i = 0; i < 13; i++){
+    str[i] = (char)data.byteArray[i];
+  }
+  str[i] = 0;
 
-	printf("Disk contents first 13 characters: %s\n", str);
+  printf("Disk contents first 13 characters: %s\n", str);
 
-	free(data.byteArray);
+  free(data.byteArray);
 }
 
 

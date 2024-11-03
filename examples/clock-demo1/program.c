@@ -7,25 +7,25 @@
 #include <stdio.h>
 
 void Program(ClockStructure *clock){
-	double resolution, range;
-	double currentTime, lastTime;
-	bool done;
+  double resolution, range;
+  double currentTime, lastTime;
+  bool done;
 
-	ClockSpecs(clock, &resolution, &range);
+  ClockSpecs(clock, &resolution, &range);
 
-	currentTime = CurrentTime(clock, -2);
+  currentTime = CurrentTime(clock, -2);
 
-	printf("The current time is: %f\n", currentTime);
-	printf("Waiting one second\n");
+  printf("The current time is: %f\n", currentTime);
+  printf("Waiting one second\n");
 
-	lastTime = currentTime;
-	done = false;
-	for(; !done;){
-		currentTime = CurrentTime(clock, -2);
-		done = currentTime - lastTime > 1;
-	}
+  lastTime = currentTime;
+  done = false;
+  for(; !done;){
+    currentTime = CurrentTime(clock, -2);
+    done = currentTime - lastTime > 1;
+  }
 
-	printf("The current time is: %f\n", currentTime);
+  printf("The current time is: %f\n", currentTime);
 }
 
 
