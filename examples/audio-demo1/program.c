@@ -1,26 +1,15 @@
 #include "program.h"
 
 #include <stdlib.h>
-#include <string.h>
 #include <math.h>
 #include <stdbool.h>
 
 void Program(AudioStructure *audio1){
-  double w, h, d;
-  double *pixels, i;
-
-  double *history;
-  double length;
-  _Bool *state;
-  double characters, controlKeys, historyMaxLength;
-
-  _Bool done;
-  int counter;
-  int cur = 0;
-  int size;
+  double i, samplesps, mindelay, sw;
+  bool done;
+  int counter, cur, size;
 
   // Audio
-  double samplesps, mindelay, sw;
   AudioSamplesMinDelay(audio1, &samplesps, &mindelay);
 
   size = samplesps * 2;
@@ -34,6 +23,7 @@ void Program(AudioStructure *audio1){
 
   // Main loop
   done = false;
+  cur = 0;
   for(counter = 0; !done && cur < size; counter++){
 
     // Write next audio samles
