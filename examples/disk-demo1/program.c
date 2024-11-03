@@ -10,7 +10,7 @@
 
 void Program(DiskStructure *disk){
   NumberReference entries, entrysize;
-  _Bool success;
+  bool success;
   ByteArrayReference data;
   int i;
   char str[100];

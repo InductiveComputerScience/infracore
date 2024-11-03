@@ -72,7 +72,7 @@ Program:                                  ; Start of Program
     movq xmm0, [delay]                    ; if delay < mindelay * 1.5 
     movq xmm1, [mindelay]                 ; ---
     mov rax, __?float64?__(1.5)           ; t1 = 1.5
-    cvtsi2sd xmm2, rax                    ; ---
+    movq xmm2, rax                        ; ---
     mulsd xmm1, xmm2                      ; t2 = mindelay * t1
     comisd xmm0, xmm1                     ; delay < t2 -- set EFLAGS accordingly
 

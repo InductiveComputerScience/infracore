@@ -43,7 +43,7 @@ struct DiskServerStructure{
 typedef struct DiskServerStructure DiskServerStructure;
 
 void Entries(DiskStructure *disk, NumberReference *entries, NumberReference *entrysize);
-_Bool Write(DiskStructure *disk, double entry, uint8_t *data, size_t dataLength);
-_Bool Read(DiskStructure *disk, double entry, ByteArrayReference *data);
+bool Write(DiskStructure *disk, double entry, uint8_t *data, size_t dataLength);
+bool Read(DiskStructure *disk, double entry, ByteArrayReference *data);
 
 #endif
