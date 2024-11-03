@@ -2,7 +2,7 @@
 
 section .bss                              ; Global variables initialized to 0
 
-  samples: resq 48000*2                   ; The image to be displayed, color bytes: R, G, B, A
+  samples: resq 48000*2                   ; The audio buffer, one sample is a double between 0 and 1
   size: resq 1                            ; The size of the audio buffer
   mindelay: resq 1                        ; The minimum delay of the audio
   audio: resq 1                           ; The pointer to the screen device
