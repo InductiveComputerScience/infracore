@@ -1,3 +1,6 @@
+#include <Screen.h>
+#include <Keyboard.h>
+
 #include "program.h"
 
 #include <stdlib.h>
@@ -17,7 +20,7 @@ void Program(ScreenStructure *screen, KeyboardStructure *keyboard){
   bool *state;
   double characters, controlKeys, historyMaxLength;
 
-  _Bool done;
+  bool done;
   int counter;
 
   // Screen
