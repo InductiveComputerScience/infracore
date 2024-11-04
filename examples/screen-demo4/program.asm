@@ -30,11 +30,11 @@ Program:                                  ; Start of Program
 
   mov qword [counter], 60*4               ; Loop this many times
   loop:                                   ; Start of loop
-		; Set pixel
-		mov rax, [dxp]                        ; Change x position
-		add [xpos], rax                       ; ---
-		mov rax, [dyp]                        ; Change y position
-		add [ypos], rax                       ; ---
+    ; Set pixel
+    mov rax, [dxp]                        ; Change x position
+    add [xpos], rax                       ; ---
+    mov rax, [dyp]                        ; Change y position
+    add [ypos], rax                       ; ---
 
     ; Draw pixel
     mov rdx, qword [xpos]                 ; Pixel Row
@@ -45,23 +45,23 @@ Program:                                  ; Start of Program
     mov byte [pixels + rax*4 + 1], 255    ; Green
     mov byte [pixels + rax*4 + 2], 255    ; Blue
 
-		; Check keyboard
+    ; Check keyboard
     mov rdi, [keyboard]                   ; (keyboard, history, state, &length);
-		mov rsi, history                      ; ---
-		mov rdx, state                        ; ---
-		mov rcx, length                       ; ---
-		call GetKeyboardState                 ; Get keyboard events since last check
+    mov rsi, history                      ; ---
+    mov rdx, state                        ; ---
+    mov rcx, length                       ; ---
+    call GetKeyboardState                 ; Get keyboard events since last check
 
-		; Check which keys were pressed
-		mov rcx, 0                            ; Loop over events
-		keyloop:
-			cvtsd2si rdi, [history + rcx*8]     ; Get event
-			mov esi, [state + rcx*4]            ; Get state
-			call KeyEvent                       ; Perform actions based on event
+    ; Check which keys were pressed
+    mov rcx, 0                            ; Loop over events
+    keyloop:
+      cvtsd2si rdi, [history + rcx*8]     ; Get event
+      mov esi, [state + rcx*4]            ; Get state
+      call KeyEvent                       ; Perform actions based on event
 
-			cvtsi2sd xmm0, rcx                  ; while count < length
-			comisd xmm0, [length]               ; ---
-		jl keyloop                            ; ---
+      cvtsi2sd xmm0, rcx                  ; while count < length
+      comisd xmm0, [length]               ; ---
+    jl keyloop                            ; ---
 
     ; Display image on screen
     mov rdi, [screen]                     ; Set up parameters: (screen, pixels)
@@ -78,40 +78,40 @@ Program:                                  ; Start of Program
   ret                                     ; Return
 
 KeyEvent:                                 ; Function for doing something based on keyboard events
-	enter 0, 0                              ; Start stack frame
+  enter 0, 0                              ; Start stack frame
 
-	cmp edi, 0                              ; Skip if key up
-	je done                                 ; ---
+  cmp edi, 0                              ; Skip if key up
+  je done                                 ; ---
 
-	cmp rdi, -1                             ; Up
-	je up                                   ; ---
-	cmp rdi, -2                             ; Down
-	je down                                 ; ---
-	cmp rdi, -3                             ; Left
-	je left                                 ; ---
-	cmp rdi, -4                             ; Right
-	je right                                ; ---
+  cmp rdi, -1                             ; Up
+  je up                                   ; ---
+  cmp rdi, -2                             ; Down
+  je down                                 ; ---
+  cmp rdi, -3                             ; Left
+  je left                                 ; ---
+  cmp rdi, -4                             ; Right
+  je right                                ; ---
 
-	jmp done                                ; No relevant key pressed
+  jmp done                                ; No relevant key pressed
 
-	up:                                     ; Move -1, 0
-		mov qword [dyp], -1                   ; ---
-		mov qword [dxp], 0                    ; ---
-		jmp done
-	down:                                   ; Move 1, 0
-		mov qword [dyp], 1                    ; ---
-		mov qword [dxp], 0                    ; ---
-		jmp done
-	left:                                   ; Move 0, -1
-		mov qword [dyp], 0                    ; ---
-		mov qword [dxp], -1                   ; ---
-		jmp done
-	right:                                  ; Move 0, 1
-		mov qword [dyp], 0                    ; ---
-		mov qword [dxp], 1                    ; ---
-		jmp done
+  up:                                     ; Move -1, 0
+    mov qword [dyp], -1                   ; ---
+    mov qword [dxp], 0                    ; ---
+    jmp done
+  down:                                   ; Move 1, 0
+    mov qword [dyp], 1                    ; ---
+    mov qword [dxp], 0                    ; ---
+    jmp done
+  left:                                   ; Move 0, -1
+    mov qword [dyp], 0                    ; ---
+    mov qword [dxp], -1                   ; ---
+    jmp done
+  right:                                  ; Move 0, 1
+    mov qword [dyp], 0                    ; ---
+    mov qword [dxp], 1                    ; ---
+    jmp done
 
-	done:
+  done:
 
   leave                                   ; Done with function
   ret                                     ; Return
