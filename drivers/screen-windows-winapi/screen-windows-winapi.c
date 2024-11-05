@@ -21,14 +21,10 @@ struct ScreenStructureWinAPI{
 	HANDLE semVSync;
   bool initSuccess;
   bool quit;
-  //pthread_t thread_id;
   int width;
   int height;
   double density;
 	HINSTANCE hInstance;
-  //SDL_Window *window;
-  //SDL_Renderer *renderer;
-  //SDL_Texture *texture;
   //KeyboardStructure *keyboard;
 
 	struct {
@@ -74,12 +70,8 @@ bool CreateScreenWinAPI(ScreenStructure **screen, HINSTANCE rInstance, int64_t w
 
 	CreateThread(NULL, 0, ScreenDriverThread, screenS, 0, &screenS->thread_id);
 
-	WaitForSingleObject(&screenS->semInit, INFINITE);
+	WaitForSingleObject(screenS->semInit, INFINITE);
 	printf("initialized\n");
-  
-  //printf("Waiting for screen init\n");
-  WaitForSingleObject(&screenS->initDone, INFINITE);
-  //printf("Screen init done, returning\n");
 
   return screenS->initSuccess;
 }
@@ -106,8 +98,6 @@ double xGetCurrentTime(){
 
 	return s;
 }
-
-
 
 int ScreenPUProgram();
 
@@ -144,6 +134,7 @@ DWORD WINAPI ScreenDriverThread(LPVOID lpParam){
 
     const wchar_t window_class_name[] = L"My Window Class";
     static WNDCLASS window_class = { 0 };
+
     window_class.lpfnWndProc = WindowProcessMessage;
     window_class.hInstance = screenS->hInstance;
     window_class.lpszClassName = window_class_name;
@@ -228,6 +219,8 @@ LRESULT CALLBACK WindowProcessMessage(HWND window_handle, UINT message, WPARAM w
 
 		          screenS->frame.width =  LOWORD(lParam);
 		          screenS->frame.height = HIWORD(lParam);
+
+							screenS->initSuccess = true;
 							ReleaseSemaphore(screenS->semInit, 1, NULL);
 							init = true;
 						}
