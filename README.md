@@ -17,8 +17,10 @@ This repo contains device interfaces, drivers and example programs.
 ## Drivers
  * screen and keyboard
    * [SDL Driver](drivers/screen-linux-sdl)
+   * [Windows API Driver](drivers/screen-windows-winapi)
  * audio
    * [ALSA Driver](drivers/audio-linux-alsa/)
+   * [Windows Waveform Driver](drivers/audio-windows-waveform)
  * clock
    * [C11 Driver](drivers/clock-c11/)
    * [Linux Driver](drivers/clock-linux/)
@@ -32,11 +34,9 @@ This repo contains device interfaces, drivers and example programs.
 
 
 ## Examples
- * screen and keyboard
-   * [Demo1](examples/screen-demo1/program.c) -- Drawing pixels to a screen, exit by pressing esc.
-   * [Demo2](examples/screen-demo2/program.c) -- Drawing pixels to a screen for some seconds.
-   * [Demo3](examples/screen-demo3/program.asm) -- Drawing pixels to a screen in x86-64 assembly.
-   * [Demo4](examples/screen-demo4/program.asm) -- Control screen and keyboard with x86-64 assembly.
+ * screen
+   * [Demo1](examples/screen-demo1/program.c) -- Drawing pixels to a screen for some seconds.
+   * [Demo1](examples/screen-demo2/program.asm) -- Drawing pixels to a screen in x86-64 assembly.
  * audio
    * [Demo1](examples/audio-demo1/program.c) -- Sending a pure C tone to an audio device.
    * [Demo2](examples/audio-demo2/program.asm) -- Sending a pure C tone to an audio device in x86-64 assembly.
@@ -53,6 +53,11 @@ This repo contains device interfaces, drivers and example programs.
    * [Demo1](examples/puc-demo1/program.c) -- Run two programs in two processing units.
    * [Demo2](examples/puc-demo2/program.c) -- Restart on exception.
    * [Demo3](examples/puc-demo3/program.c) -- Running multiple programs but not using more than one CPU.
+
+## Examples with Multiple Devices
+ * screen and keyboard
+   * [Demo1](examples/screen-demo1/program.c) -- Drawing pixels to a screen, exit by pressing esc.
+   * [Demo4](examples/screen-demo2/program.asm) -- Control screen and keyboard with x86-64 assembly.
 
 ## API Functions
 
