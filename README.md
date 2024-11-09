@@ -57,7 +57,7 @@ This repo contains device interfaces, drivers and example programs.
 ## Examples with Multiple Devices
  * screen and keyboard
    * [Demo1](examples/screen-demo1/program.c) -- Drawing pixels to a screen, exit by pressing esc.
-   * [Demo4](examples/screen-demo2/program.asm) -- Control screen and keyboard with x86-64 assembly.
+   * [Demo2](examples/screen-demo2/program.asm) -- Control screen and keyboard with x86-64 assembly.
 
 ## API Functions
 

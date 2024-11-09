@@ -8,7 +8,7 @@ REM - Infrastructural Program
 cl /c launcher.c /I ..\..\..\devices\screen
 
 REM Program
-ml64 /I ..\..\..\devices\screen\ /c ../program-masm.asm 
+ml64 /I ..\..\..\devices\screen\ /c ..\program-masm.asm 
 
 REM - Combine the whole program
 link /out:program.exe program-masm.obj launcher.obj screen-windows-winapi.obj user32.lib gdi32.lib
