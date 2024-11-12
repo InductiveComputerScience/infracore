@@ -7,7 +7,7 @@
 #undef GetKeyboardState
 
 bool CreateScreenWinAPI(ScreenStructure **screen, HINSTANCE rInstance, int64_t w, int64_t h, double d);
-bool CloseScreenWinAPI(ScreenStructure *screen);
+void CloseScreenWinAPI(ScreenStructure *screen);
 
-bool CreateKeyboardWinAPI(KeyboardStructure **keyboard, ScreenStructure *screen);
-bool CloseKeyboardWinAPI(KeyboardStructure *keyboard);
+void CreateKeyboardWinAPI(KeyboardStructure **keyboard, ScreenStructure *screen);
+void CloseKeyboardWinAPI(KeyboardStructure *keyboard);

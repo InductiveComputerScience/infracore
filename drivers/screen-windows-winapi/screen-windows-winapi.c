@@ -79,7 +79,7 @@ bool CreateScreenWinAPI(ScreenStructure **screen, HINSTANCE rInstance, int64_t w
   return screenS->initSuccess;
 }
 
-bool CloseScreenWinAPI(ScreenStructure *screen){
+void CloseScreenWinAPI(ScreenStructure *screen){
   ScreenStructureWinAPI *screenS;
   screenS = (ScreenStructureWinAPI*)screen->p;
 
@@ -123,7 +123,7 @@ void AddKeyboardEvent(KeyboardStructureWinAPI *keyboardS, int code, bool state){
   }
 }
 
-bool CreateKeyboardWinAPI(KeyboardStructure **keyboard, ScreenStructure *screen){
+void CreateKeyboardWinAPI(KeyboardStructure **keyboard, ScreenStructure *screen){
   ScreenStructureWinAPI *screenS;
 
   screenS = (ScreenStructureWinAPI*)screen->p;
@@ -131,7 +131,7 @@ bool CreateKeyboardWinAPI(KeyboardStructure **keyboard, ScreenStructure *screen)
   *keyboard = screenS->keyboard;
 }
 
-bool CreateKeyboardWinAPIInner(KeyboardStructure **keyboard){
+void CreateKeyboardWinAPIInner(KeyboardStructure **keyboard){
   double i;
   KeyboardStructureWinAPI *keyboardS;
 
@@ -250,7 +250,7 @@ LRESULT CALLBACK WindowProcessMessage(HWND window_handle, UINT message, WPARAM w
         } break;
 
         case WM_SYSKEYDOWN: {
-            printf("syskey %d\n", wParam);
+            //printf("syskey %d\n", wParam);
 
           } break;
 
