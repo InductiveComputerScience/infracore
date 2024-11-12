@@ -9,4 +9,4 @@ gcc -c launcher.c -I ../../../devices/disk
 gcc -c ../program.c -I ../../../devices/disk
 
 # - Combine the whole program
-gcc -o program program.o launcher.o disk-c89-file.o -lm -lrt -lpthread
+gcc -o program program.o launcher.o disk-c89-file.o
