@@ -154,7 +154,7 @@ void CreateKeyboardWinAPIInner(KeyboardStructure **keyboard){
   return true;
 }
 
-bool CloseKeyboardWinAPI(KeyboardStructure *keyboard){
+void CloseKeyboardWinAPI(KeyboardStructure *keyboard){
 }
 
 // ----------------------------------------------------------------------------
