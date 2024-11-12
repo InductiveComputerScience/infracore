@@ -1,6 +1,8 @@
 #define WIN32_LEAN_AND_MEAN
 #define UNICODE
+#define GetKeyboardState GetKeyboardStateX
 #include <windows.h>
+#undef GetKeyboardState
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -9,6 +11,7 @@
 #include <math.h>
 
 #include <Screen.h>
+#include <Keyboard.h>
 
 DWORD WINAPI ScreenDriverThread(LPVOID lpParam);
 
@@ -25,7 +28,7 @@ struct ScreenStructureWinAPI{
   int height;
   double density;
   HINSTANCE hInstance;
-  //KeyboardStructure *keyboard;
+  KeyboardStructure *keyboard;
 
   struct {
       int width;
@@ -99,28 +102,60 @@ double xGetCurrentTime(){
   return s;
 }
 
-int ScreenPUProgram();
+struct KeyboardStructureWinAPI{
+  double characters;
+  double controlKeys;
+  int historyMaxLength;
+  double *history;
+  bool *state;
+  int pos;
+  bool shiftdown;
+};
 
-/*int WINAPI WinMain(HINSTANCE rInstance, HINSTANCE PrevInstance, LPSTR CmdLine, int CmdShow) {
-  hInstance = rInstance;
+typedef struct KeyboardStructureWinAPI KeyboardStructureWinAPI;
 
-  semInit = CreateSemaphore(NULL, 0, 1, NULL);
-  semDone = CreateSemaphore(NULL, 0, 1, NULL);
-  semVSync = CreateSemaphore(NULL, 0, 1, NULL);
+void AddKeyboardEvent(KeyboardStructureWinAPI *keyboardS, int code, bool state){
+  //printf("Adding event %d, %d\n", code, state);
+  if(keyboardS->pos < keyboardS->historyMaxLength){
+    keyboardS->history[keyboardS->pos] = code;
+    keyboardS->state[keyboardS->pos] = state;
+    keyboardS->pos++;
+  }
+}
 
-  DWORD thread_id;
-  CreateThread(NULL, 0, ScreenDriverThread, NULL, 0, &thread_id);
+bool CreateKeyboardWinAPI(KeyboardStructure **keyboard, ScreenStructure *screen){
+  ScreenStructureWinAPI *screenS;
 
-  WaitForSingleObject(semInit, INFINITE);
-  printf("initialized\n");
+  screenS = (ScreenStructureWinAPI*)screen->p;
 
-  ScreenPUProgram();
+  *keyboard = screenS->keyboard;
+}
 
-  quit = true;
-  WaitForSingleObject(semDone, INFINITE);
+bool CreateKeyboardWinAPIInner(KeyboardStructure **keyboard){
+  double i;
+  KeyboardStructureWinAPI *keyboardS;
 
-  return 0;
-}*/
+  *keyboard = malloc(sizeof(KeyboardStructure));
+  keyboardS = malloc(sizeof(KeyboardStructureWinAPI));
+  (*keyboard)->p = keyboardS;
+
+  keyboardS->characters = 128;
+  keyboardS->controlKeys = 47;
+  keyboardS->historyMaxLength = 20;
+
+  keyboardS->history = malloc((keyboardS->historyMaxLength)*sizeof(double));
+  keyboardS->state = malloc((keyboardS->historyMaxLength)*sizeof(bool));
+  for(i = 0; i < keyboardS->historyMaxLength; i = i + 1){
+    keyboardS->history[(int)i] = 0;
+    keyboardS->state[(int)i] = false;
+  }
+  keyboardS->pos = 0;
+
+  return true;
+}
+
+bool CloseKeyboardWinAPI(KeyboardStructure *keyboard){
+}
 
 // ----------------------------------------------------------------------------
 
@@ -178,7 +213,13 @@ DWORD WINAPI ScreenDriverThread(LPVOID lpParam){
 
 
 LRESULT CALLBACK WindowProcessMessage(HWND window_handle, UINT message, WPARAM wParam, LPARAM lParam) {
-     ScreenStructureWinAPI *screenS = screenS_Global;
+    ScreenStructureWinAPI *screenS = screenS_Global;
+    KeyboardStructure *keyboard = screenS->keyboard;
+    KeyboardStructureWinAPI *keyboardS;
+
+    if(screenS->keyboard != NULL){
+      keyboardS = (KeyboardStructureWinAPI*)keyboard->p;
+    }
 
     switch(message) {
         case WM_QUIT:
@@ -208,6 +249,106 @@ LRESULT CALLBACK WindowProcessMessage(HWND window_handle, UINT message, WPARAM w
             last = now;
         } break;
 
+        case WM_SYSKEYDOWN: {
+            printf("syskey %d\n", wParam);
+
+          } break;
+
+        case WM_SYSKEYUP: {
+
+          } break;
+
+        case WM_KEYDOWN:
+            // 1-4 - Left, Right, Up, Down
+            if(wParam == VK_UP){
+              AddKeyboardEvent(keyboardS, -1, true);
+            }
+            if(wParam == VK_DOWN){
+              AddKeyboardEvent(keyboardS, -2, true);
+            }
+            if(wParam == VK_LEFT){
+              AddKeyboardEvent(keyboardS, -3, true);
+            }
+            if(wParam == VK_RIGHT){
+              AddKeyboardEvent(keyboardS, -4, true);
+            }
+            if(wParam == VK_ESCAPE){
+              AddKeyboardEvent(keyboardS, -43, true);
+            }
+
+            // 5-10 - LSHIFT, RSHIFT, ALT, ALTGR, LCTRL, RCTRL
+            if(wParam == VK_SHIFT){
+              keyboardS->shiftdown = true;
+              //if(GetAsyncKeyState(VK_LSHIFT) & 0x8000){
+                AddKeyboardEvent(keyboardS, -5, true);
+              //}else if(GetAsyncKeyState(VK_RSHIFT) & 0x8000){
+              //  AddKeyboardEvent(keyboardS, -6, true);
+              //}
+            }
+            if(wParam == VK_LMENU){
+              AddKeyboardEvent(keyboardS, -7, true);
+            }
+            if(wParam == VK_RMENU){
+              AddKeyboardEvent(keyboardS, -8, true);
+            }
+            if(wParam == VK_LCONTROL){
+              AddKeyboardEvent(keyboardS, -9, true);
+            }
+            if(wParam == VK_RCONTROL){
+              AddKeyboardEvent(keyboardS, -10, true);
+            }
+
+            // A-Z, a-z -- 65-90, 97-122 -- 52 keys
+            if(wParam >= 'A' && wParam <= 'Z') {
+              //printf("Shift %d\n", keyboardS->shiftdown);
+              if(keyboardS->shiftdown) {
+                AddKeyboardEvent(keyboardS, wParam, true);
+              }else{
+                AddKeyboardEvent(keyboardS, wParam - 'A' + 'a', true);
+              }
+            }
+
+            break;
+
+        case WM_KEYUP:
+            // 1-4 - Left, Right, Up, Down
+            if(wParam == VK_UP){
+              AddKeyboardEvent(keyboardS, -1, false);
+            }
+            if(wParam == VK_DOWN){
+              AddKeyboardEvent(keyboardS, -2, false);
+            }
+            if(wParam == VK_LEFT){
+              AddKeyboardEvent(keyboardS, -3, false);
+            }
+            if(wParam == VK_RIGHT){
+              AddKeyboardEvent(keyboardS, -4, false);
+            }
+            if(wParam == VK_ESCAPE){
+              AddKeyboardEvent(keyboardS, -43, false);
+            }
+
+            // 5-10 - LSHIFT, RSHIFT, ALT, ALTGR, LCTRL, RCTRL
+            if(wParam == VK_SHIFT){
+              keyboardS->shiftdown = false;
+              //if(GetAsyncKeyState(VK_LSHIFT) & 0x8000){
+                AddKeyboardEvent(keyboardS, -5, false);
+              //}else if(GetAsyncKeyState(VK_RSHIFT) & 0x8000){
+              //  AddKeyboardEvent(keyboardS, -6, false);
+              //}
+            }
+
+            // A-Z, a-z -- 65-90, 97-122 -- 52 keys
+            if(wParam >= 'A' && wParam <= 'Z') {
+              if(keyboardS->shiftdown) {
+                AddKeyboardEvent(keyboardS, wParam, false);
+              }else{
+                AddKeyboardEvent(keyboardS, wParam - 'A' + 'a', false);
+              }
+            }
+
+            break;
+
         case WM_SIZE: {
             if(!init){
               screenS->frame_bitmap_info.bmiHeader.biWidth  = LOWORD(lParam);
@@ -223,6 +364,9 @@ LRESULT CALLBACK WindowProcessMessage(HWND window_handle, UINT message, WPARAM w
               screenS->frame.height = HIWORD(lParam);
 
               screenS->initSuccess = true;
+
+              CreateKeyboardWinAPIInner(&screenS->keyboard);
+
               ReleaseSemaphore(screenS->semInit, 1, NULL);
               init = true;
             }
@@ -298,6 +442,33 @@ void Synchronize(ScreenStructure *screen){
   WaitForSingleObject(screenS->semVSync, INFINITE);
 }
 
+// ============================================================================
+
+void GetKeyboardSpecs(KeyboardStructure *keyboard, double *characters, double *controlKeys, double *historyMaxLength){
+  KeyboardStructureWinAPI *keyboardS;
+
+  keyboardS = (KeyboardStructureWinAPI*)keyboard->p;
+
+  *characters = keyboardS->characters;
+  *controlKeys = keyboardS->controlKeys;
+  *historyMaxLength = keyboardS->historyMaxLength;
+}
+
+void GetKeyboardState(KeyboardStructure *keyboard, double *history, bool *state, double *length){
+  int i;
+  KeyboardStructureWinAPI *keyboardS;
+
+  keyboardS = (KeyboardStructureWinAPI*)keyboard->p;
+
+  *length = keyboardS->pos;
+
+  for(i = 0; i < keyboardS->pos; i = i + 1){
+    history[i] = keyboardS->history[i];
+    state[i] = keyboardS->state[i];
+  }
+
+  keyboardS->pos = 0;
+}
 
 
 
