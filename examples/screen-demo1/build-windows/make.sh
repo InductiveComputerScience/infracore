@@ -1,6 +1,6 @@
 # Program 1
 # - Devices
-i686-w64-mingw32-gcc -c ../../../drivers/screen-windows-winapi/screen-windows-winapi.c -I ../../../devices/screen/
+i686-w64-mingw32-gcc -c ../../../drivers/screen-windows-winapi/screen-windows-winapi.c -I ../../../devices/screen/ -I ../../../devices/keyboard/
 
 # - Infrastructural Program
 i686-w64-mingw32-gcc -c launcher.c -I ../../../devices/screen

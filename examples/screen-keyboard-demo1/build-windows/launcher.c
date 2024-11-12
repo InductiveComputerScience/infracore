@@ -20,7 +20,7 @@ int WINAPI WinMain(HINSTANCE rInstance, HINSTANCE PrevInstance, LPSTR CmdLine, i
   success = CreateScreenWinAPI(&screen1, rInstance, 640, 480, 1920/0.508);
 
   if(success){
-    success = CreateKeyboardWinAPI(&keyboard1, screen1);
+    CreateKeyboardWinAPI(&keyboard1, screen1);
   }
 
   if(success){
