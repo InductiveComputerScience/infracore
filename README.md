@@ -7,7 +7,7 @@ This repo contains device interfaces, drivers and example programs.
 
 ## Devices
  * screen - [interface](devices/screen/Screen.h)
- * keyboard - [interface](devices/screen/Keyboard.h)
+ * keyboard - [interface](devices/keyboard/Keyboard.h)
  * audio - [interface](devices/audio/Audio.h)
  * clock - [interface](devices/clock/Clock.h)
  * disk - [interface](devices/disk/Disk.h)

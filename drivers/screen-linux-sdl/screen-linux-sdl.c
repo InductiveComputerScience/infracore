@@ -669,13 +669,22 @@ void DisplayProgsbase(ScreenStructure *screen, double *rpixels){
   }
 }
 
-void Display(ScreenStructure *screen, uint32_t *rpixels){
+void DisplayUnbuffered(ScreenStructure *screen, uint32_t *rpixels){
   int x, y, r, g, b, p;
   ScreenStructureLinuxSDL *screenS;
 
   screenS = (ScreenStructureLinuxSDL*)screen->p;
 
   screenS->pixels = rpixels;
+}
+
+void Display(ScreenStructure *screen, uint32_t *rpixels){
+  int x, y, r, g, b, p;
+  ScreenStructureLinuxSDL *screenS;
+
+  screenS = (ScreenStructureLinuxSDL*)screen->p;
+
+  memcpy(screenS->pixels, rpixels, (size_t)(screenS->height * screenS->width * 4));
 }
 
 
