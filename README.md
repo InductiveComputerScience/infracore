@@ -18,6 +18,7 @@ This repo contains device interfaces, drivers and example programs.
  * screen and keyboard
    * [SDL Driver](drivers/screen-linux-sdl)
    * [Windows API Driver](drivers/screen-windows-winapi)
+   * [Java JFrame Driver](drivers/screen-java-jframe)
  * audio
    * [ALSA Driver](drivers/audio-linux-alsa/)
    * [Windows Waveform Driver](drivers/audio-windows-waveform)
@@ -35,29 +36,29 @@ This repo contains device interfaces, drivers and example programs.
 
 ## Examples
  * screen
-   * [Demo1](examples/screen-demo1/program.c) -- Drawing pixels to a screen for some seconds.
-   * [Demo1](examples/screen-demo2/program.asm) -- Drawing pixels to a screen in x86-64 assembly.
+   * [Demo 1](examples/screen-demo1/program.c) -- Drawing pixels to a screen for some seconds.
+   * [Demo 2](examples/screen-demo2/program.asm) -- Drawing pixels to a screen in x86-64 assembly.
  * audio
-   * [Demo1](examples/audio-demo1/program.c) -- Sending a pure C tone to an audio device.
-   * [Demo2](examples/audio-demo2/program.asm) -- Sending a pure C tone to an audio device in x86-64 assembly.
+   * [Demo 1](examples/audio-demo1/program.c) -- Sending a pure C tone to an audio device.
+   * [Demo 2](examples/audio-demo2/program.asm) -- Sending a pure C tone to an audio device in x86-64 assembly.
  * clock
-   * [Demo1](examples/clock-demo1/program.c) -- Prints the current time on screen, waits a second, and prints the time again.
-   * [Demo2](examples/clock-demo2/program.asm) -- Runs for 1 second. In x86-64 assembly.
+   * [Demo 1](examples/clock-demo1/program.c) -- Prints the current time on screen, waits a second, and prints the time again.
+   * [Demo 2](examples/clock-demo2/program.asm) -- Runs for 1 second. In x86-64 assembly.
  * disk
-   * [Demo1](examples/disk-demo1/program.c) -- Read a string from disk and print it.
-   * [Demo2](examples/disk-demo2/program.asm) -- Read a string from disk and print it in x86-64 assembly.
+   * [Demo 1](examples/disk-demo1/program.c) -- Read a string from disk and print it.
+   * [Demo 2](examples/disk-demo2/program.asm) -- Read a string from disk and print it in x86-64 assembly.
  * processing unit (PU)
-   * [Server Demo1](examples/pu-server-demo1/program.c) -- Echoes the request in upper case.
-   * [Client Demo1](examples/pu-client-demo1/program.c) -- Sends the message "Hello, world!" to a server.
+   * [Server Demo 1](examples/pu-server-demo1/program.c) -- Echoes the request in upper case.
+   * [Client Demo 1](examples/pu-client-demo1/program.c) -- Sends the message "Hello, world!" to a server.
  * processing unit controller (PUC)
-   * [Demo1](examples/puc-demo1/program.c) -- Run two programs in two processing units.
-   * [Demo2](examples/puc-demo2/program.c) -- Restart on exception.
-   * [Demo3](examples/puc-demo3/program.c) -- Running multiple programs but not using more than one CPU.
+   * [Demo 1](examples/puc-demo1/program.c) -- Run two programs in two processing units.
+   * [Demo 2](examples/puc-demo2/program.c) -- Restart on exception.
+   * [Demo 3](examples/puc-demo3/program.c) -- Running multiple programs but not using more than one CPU.
 
 ## Examples with Multiple Devices
  * screen and keyboard
-   * [Demo1](examples/screen-demo1/program.c) -- Drawing pixels to a screen, exit by pressing esc.
-   * [Demo2](examples/screen-demo2/program.asm) -- Control screen and keyboard with x86-64 assembly.
+   * [Demo 1](examples/screen-demo1/program.c) -- Drawing pixels to a screen, exit by pressing esc.
+   * [Demo 2](examples/screen-demo2/program.asm) -- Control screen and keyboard with x86-64 assembly.
 
 ## API Functions
 
