@@ -1,8 +1,8 @@
 package Program;
 
-import Screen.Screen.ScreenStructure;
+import Screen.ScreenStructure;
 
-import static Screen.Screen.Screen.*;
+import static Screen.Screen.*;
 
 public class Launcher {
     public static void main(String[] args) {

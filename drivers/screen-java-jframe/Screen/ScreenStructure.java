@@ -1,8 +1,8 @@
-package Screen.Screen;
+package Screen;
 
 public class ScreenStructure{
     public int w;
     public int h;
-    Screen javaScreen;
-    long last;
+    public long last;
+    public Screen javaScreen;
 }

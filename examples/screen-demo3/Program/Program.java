@@ -1,9 +1,9 @@
 package Program;
 
-import Screen.Screen.NumberReference;
-import Screen.Screen.ScreenStructure;
+import Screen.NumberReference;
+import Screen.ScreenStructure;
 
-import static Screen.Screen.Screen.*;
+import static Screen.Screen.*;
 
 public class Program {
     public static void Program(ScreenStructure screen1){

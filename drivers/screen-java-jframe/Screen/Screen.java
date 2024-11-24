@@ -1,4 +1,4 @@
-package Screen.Screen;
+package Screen;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
