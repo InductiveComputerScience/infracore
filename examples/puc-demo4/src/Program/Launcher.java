@@ -2,8 +2,6 @@ package Program;
 
 import ProcessingUnitController.ProcessingUnitControllerStructure;
 
-import java.util.concurrent.Callable;
-
 import static ProcessingUnitController.ProcessingUnitController.*;
 
 public class Launcher {
@@ -32,28 +30,5 @@ public class Launcher {
         }
 
         ClosePUC(puc1);
-    }
-
-
-    public static Thread CreateThread(int nr, ProcessingUnitControllerStructure puc, Callable<Integer> task){
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                boolean ex;
-                ex = true;
-                for (; ex; ) {
-                    ex = false;
-
-                    try {
-                        task.call();
-                    } catch (Exception | Error e) {
-                        ex = true;
-                        puc.wasException[nr] = true;
-                    }
-                }
-            }
-        };
-
-        return thread;
     }
 }
